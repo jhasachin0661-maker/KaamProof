@@ -10,8 +10,8 @@ export type Role = "worker" | "employer";
 
 export interface Principal {
   userId: string;
-  email: string;
-  phone: string | null;
+  email: string | null;
+  phone: string;
   name: string;
   role: Role;
   profile: Record<string, unknown> | null;
@@ -20,20 +20,13 @@ export interface Principal {
 
 export const SESSION_COOKIE = "kp_session";
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-const BCRYPT_COST = 12;
-
-/* ---------- passwords ---------- */
-export function validatePassword(pw: unknown): string {
-  if (typeof pw !== "string") throw Errors.invalid("Password is required.", "पासवर्ड आवश्यक है।");
-  if (pw.length < 10) throw Errors.invalid("Password must be at least 10 characters.", "पासवर्ड कम से कम 10 अक्षर का होना चाहिए।");
-  if (Buffer.byteLength(pw) > 72) throw Errors.invalid("Password is too long (max 72 bytes).", "पासवर्ड बहुत लंबा है।");
-  if (!/[A-Za-z]/.test(pw) || !/\d/.test(pw)) throw Errors.invalid("Password must contain letters and numbers.", "पासवर्ड में अक्षर और अंक दोनों होने चाहिए।");
-  return pw;
+export async function hashPassword(password: string) {
+  return bcrypt.hash(password, 12);
 }
-export const hashPassword = (pw: string) => bcrypt.hash(pw, BCRYPT_COST);
-export const verifyPassword = (pw: string, hash: string) => bcrypt.compare(pw, hash);
-// Used to keep login timing similar when the email does not exist.
-export const DUMMY_HASH = bcrypt.hashSync("kaamproof-dummy-password-1", 4);
+
+export async function verifyPassword(password: string, passwordHash: string | null) {
+  return Boolean(passwordHash) && bcrypt.compare(password, passwordHash!);
+}
 
 /* ---------- sessions (opaque token in HttpOnly cookie; only its SHA-256 is stored) ---------- */
 export const hashToken = (token: string) => crypto.createHash("sha256").update(token).digest("hex");

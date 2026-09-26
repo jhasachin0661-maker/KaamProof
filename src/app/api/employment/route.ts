@@ -7,7 +7,7 @@ import { getOwnedRelationship, type Agreement } from "@/lib/access";
 import { Errors, errorResponse, isUniqueViolation } from "@/lib/errors";
 import { logAuditEvent } from "@/lib/audit";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { normalizeEmail, num, oneOf, readJson, str, uuid, type Body } from "@/lib/validate";
+import { normalizePhone, num, oneOf, readJson, str, uuid, type Body } from "@/lib/validate";
 
 export const dynamic = "force-dynamic";
 
@@ -77,14 +77,14 @@ export async function POST(request: Request) {
     const action = oneOf(b, "action", ["create", "respond", "upgrade_agreement", "accept_agreement", "reject_agreement", "end"] as const, "create");
     const now = new Date();
 
-    /* ---- create: send a request to an existing counterparty (found by exact email) ---- */
+    /* ---- create: send a request to an existing counterparty (found by exact phone number) ---- */
     if (action === "create") {
       await rateLimit(`lookup:${p.userId}`, 20, 60 * 60 * 1000);
-      const email = normalizeEmail(str(b, "counterpartyIdentifier", { max: 254 })!);
+      const phone = normalizePhone(str(b, "counterpartyIdentifier", { max: 20 })!);
       const wantRole = p.role === "worker" ? "employer" : "worker";
-      const [other] = await db.select().from(users).where(and(eq(users.email, email), eq(users.role, wantRole), eq(users.isActive, true))).limit(1);
+      const [other] = await db.select().from(users).where(and(eq(users.phone, phone), eq(users.role, wantRole), eq(users.isActive, true))).limit(1);
       if (!other || other.id === p.userId) {
-        throw Errors.notFound(`No registered ${wantRole} found with this email. Ask them to sign up first.`, `इस ईमेल से कोई ${wantRole === "employer" ? "नियोक्ता" : "श्रमिक"} पंजीकृत नहीं है। उनसे पहले साइन अप करने को कहें।`);
+        throw Errors.notFound(`No registered ${wantRole} found with this phone number. Ask them to sign up first.`, `इस फ़ोन नंबर से कोई ${wantRole === "employer" ? "नियोक्ता" : "श्रमिक"} पंजीकृत नहीं है। उनसे पहले साइन अप करने को कहें।`);
       }
       const terms = parseTerms(b);
       const roleTitle = str(b, "roleTitle", { max: 100, required: false }) ?? terms.jobType;

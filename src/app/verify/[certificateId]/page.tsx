@@ -8,12 +8,10 @@ import {
   AlertTriangle,
   QrCode,
   Calendar,
-  Clock,
-  Briefcase,
-  UserCheck,
   Building2,
   FileText,
   Lock,
+  UserCheck,
 } from "lucide-react";
 import QRCode from "qrcode";
 import Link from "next/link";
@@ -58,8 +56,7 @@ export default function VerifyPage({ params }: { params: Promise<{ certificateId
       } else {
         setData(json);
         if (json.found && json.certificate) {
-          const publicUrl = window.location.href;
-          const qrDataUrl = await QRCode.toDataURL(publicUrl, { margin: 1, width: 180 });
+          const qrDataUrl = await QRCode.toDataURL(window.location.href, { margin: 1, width: 180 });
           setQrSrc(qrDataUrl);
         }
       }
@@ -77,186 +74,172 @@ export default function VerifyPage({ params }: { params: Promise<{ certificateId
     });
   }, [params]);
 
+  const statusIsConfirmed = data?.certificate?.certificateStatus === "Fully Confirmed";
+
   return (
-    <div className="min-h-screen bg-stone-900 text-stone-100 flex flex-col justify-between p-4 sm:p-8 font-sans">
-      <div className="max-w-2xl mx-auto w-full">
-        {/* Header Branding */}
-        <div className="flex items-center justify-between mb-8 border-b border-stone-800 pb-4">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-emerald-900/50">
-              क
-            </div>
-            <div>
-              <div className="text-xl font-bold tracking-tight text-white group-hover:text-emerald-400 transition-colors">
-                KaamProof
-              </div>
-              <div className="text-xs text-stone-400">Public Work Verification Registry</div>
-            </div>
+    <div className="min-h-screen bg-kp-bg px-4 py-5 text-kp-ink sm:px-8 sm:py-8">
+      <div className="mx-auto max-w-3xl">
+        <header className="mb-6 flex items-center justify-between border-b border-kp-border pb-4">
+          <Link href="/" className="flex items-center gap-3 rounded-lg" aria-label="KaamProof home">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-kp-primary text-sm font-black text-white shadow-sm">
+              KP
+            </span>
+            <span>
+              <span className="block text-xl font-black tracking-tight text-kp-ink">KaamProof</span>
+              <span className="block text-xs font-semibold text-kp-subtle">Public Work Verification Registry</span>
+            </span>
           </Link>
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-stone-800 text-stone-300 border border-stone-700">
+          <span className="rounded-full border border-kp-border bg-white px-3 py-1 text-xs font-bold text-kp-primary-strong">
             Open Registry
           </span>
-        </div>
+        </header>
 
         {loading ? (
-          <div className="bg-stone-800/80 border border-stone-700 rounded-2xl p-12 text-center shadow-xl backdrop-blur-md">
-            <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-stone-200">Verifying Cryptographic Registry...</h2>
-            <p className="text-sm text-stone-400 mt-1">Comparing SHA-256 canonical hash with tamper-evident state</p>
-          </div>
+          <section className="rounded-lg border border-kp-border bg-white p-10 text-center shadow-xl shadow-sky-950/10">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-kp-primary border-t-transparent" />
+            <h1 className="text-lg font-black text-kp-ink">Verifying registry record</h1>
+            <p className="mt-2 text-sm leading-6 text-kp-subtle">Comparing the canonical hash with the public certificate state.</p>
+          </section>
         ) : error || !data?.found ? (
-          <div className="bg-stone-800/80 border border-red-500/30 rounded-2xl p-8 text-center shadow-xl">
-            <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white">Certificate Not Found</h2>
-            <p className="text-stone-400 text-sm mt-2 max-w-md mx-auto">
-              Certificate identifier <span className="font-mono text-red-400">{certId}</span> was not located in the
-              official KaamProof database. Ensure you scanned an authentic QR code.
+          <section className="rounded-lg border border-red-200 bg-white p-8 text-center shadow-xl shadow-red-950/5">
+            <XCircle className="mx-auto mb-4 h-16 w-16 text-red-600" />
+            <h1 className="text-2xl font-black text-kp-ink">Certificate not found</h1>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-kp-subtle">
+              Certificate identifier <span className="font-mono font-bold text-red-700">{certId}</span> was not located in
+              the KaamProof database. Ensure you scanned an authentic QR code.
             </p>
-            <div className="mt-6">
-              <Link
-                href="/"
-                className="inline-block px-5 py-2.5 rounded-xl bg-stone-700 hover:bg-stone-600 text-sm font-semibold text-white transition-colors"
-              >
-                Return to KaamProof Home
-              </Link>
-            </div>
-          </div>
+            <Link
+              href="/"
+              className="mt-6 inline-flex min-h-11 items-center rounded-lg bg-kp-primary px-5 text-sm font-black text-white hover:bg-kp-primary-strong"
+            >
+              Return home
+            </Link>
+          </section>
         ) : (
-          <div className="bg-stone-800/90 border border-stone-700 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-sm relative overflow-hidden">
-            {/* Top verification badge */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-700/80">
+          <section className="overflow-hidden rounded-lg border border-kp-border bg-white shadow-xl shadow-sky-950/10">
+            <div className="flex flex-col gap-4 border-b border-sky-100 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <div className="flex items-start gap-4">
                 <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border ${
                     data.integrityValid
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                      : "bg-amber-500/20 text-amber-400 border border-amber-500/40"
+                      ? "border-sky-200 bg-sky-50 text-kp-primary"
+                      : "border-amber-200 bg-amber-50 text-amber-700"
                   }`}
                 >
-                  {data.integrityValid ? <ShieldCheck className="w-7 h-7" /> : <AlertTriangle className="w-7 h-7" />}
+                  {data.integrityValid ? <ShieldCheck className="h-7 w-7" /> : <AlertTriangle className="h-7 w-7" />}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold tracking-wider text-emerald-400 uppercase">
-                      Official Proof-of-Work
-                    </span>
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    <span className="text-xs text-stone-400 font-mono">{data.certificate?.certificateNumber}</span>
-                  </div>
-                  <h1 className="text-2xl font-bold text-white mt-0.5">
-                    {data.integrityValid ? "Verified Work Record" : "Integrity Warning"}
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-kp-primary">Official proof-of-work</p>
+                  <h1 className="mt-1 text-2xl font-black tracking-tight text-kp-ink">
+                    {data.integrityValid ? "Verified work record" : "Integrity warning"}
                   </h1>
+                  <p className="mt-1 break-all font-mono text-xs font-semibold text-kp-subtle">
+                    {data.certificate?.certificateNumber}
+                  </p>
                 </div>
               </div>
-
-              <div className="flex sm:flex-col items-center sm:items-end justify-between">
+              <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                    data.certificate?.certificateStatus === "Fully Confirmed"
-                      ? "bg-emerald-950 text-emerald-300 border border-emerald-700"
-                      : "bg-amber-950 text-amber-300 border border-amber-700"
+                  className={`rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${
+                    statusIsConfirmed
+                      ? "border-sky-200 bg-sky-50 text-kp-primary-strong"
+                      : "border-amber-200 bg-amber-50 text-amber-800"
                   }`}
                 >
                   {data.certificate?.certificateStatus}
                 </span>
-                <span className="text-[11px] text-stone-400 mt-1">
-                  Issued: {new Date(data.certificate?.generatedAt || "").toLocaleDateString()}
+                <span className="text-xs font-semibold text-kp-subtle">
+                  Issued {new Date(data.certificate?.generatedAt || "").toLocaleDateString()}
                 </span>
               </div>
             </div>
 
-            {/* Privacy notice banner */}
-            <div className="mt-4 p-3 bg-stone-900/60 rounded-xl border border-stone-800 flex items-center gap-2.5 text-xs text-stone-400">
-              <Lock className="w-4 h-4 text-stone-400 shrink-0" />
-              <span>
-                <strong>Privacy Guaranteed:</strong> Worker phone number, residential address, and raw GPS are
-                redacted. Only cryptographically verified work metrics are shown publicly.
-              </span>
+            <div className="p-5 sm:p-6">
+              <div className="flex items-start gap-3 rounded-lg border border-sky-100 bg-sky-50/70 p-4 text-sm leading-6 text-kp-subtle">
+                <Lock className="mt-0.5 h-5 w-5 shrink-0 text-kp-primary" />
+                <span>
+                  <strong className="text-kp-primary-strong">Privacy notice:</strong> phone number, residential address,
+                  raw GPS and private notes are redacted from this public page.
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <InfoCard icon={<UserCheck className="h-4 w-4" />} label="Worker identity" value={data.certificate?.workerDisplayName} note={data.certificate?.occupation} />
+                <InfoCard icon={<Building2 className="h-4 w-4" />} label="Employer / household" value={data.certificate?.employerDisplayName} note="Verified relationship and settlement" />
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <Metric value={data.certificate?.confirmedWorkdays} label="Confirmed days" tone="primary" />
+                <Metric value={data.certificate?.confirmedHours} label="Confirmed hours" />
+                <Metric value={data.certificate?.agreedWageRate} label="Agreed wage" />
+              </div>
+
+              <div className="mt-6 flex flex-col gap-6 border-t border-sky-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-3 text-sm text-kp-subtle">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-kp-primary" />
+                    <span>
+                      Period: <strong className="text-kp-ink">{data.certificate?.periodStart}</strong> to{" "}
+                      <strong className="text-kp-ink">{data.certificate?.periodEnd}</strong>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-kp-primary" />
+                    <span>
+                      Disputed sessions: <strong className="text-amber-700">{data.certificate?.disputedSessionsCount}</strong>
+                    </span>
+                  </div>
+                  <p className="break-all border-t border-sky-100 pt-3 font-mono text-xs">SHA-256: {data.certificate?.canonicalHash}</p>
+                </div>
+
+                {qrSrc && (
+                  <div className="flex shrink-0 flex-col items-center rounded-lg border border-sky-100 bg-white p-3 shadow-sm">
+                    <QrCode className="mb-2 h-5 w-5 text-kp-primary" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={qrSrc} alt="Verification QR Code" className="h-28 w-28" />
+                    <span className="mt-2 text-[10px] font-black uppercase tracking-[0.12em] text-kp-primary-strong">Scan to verify</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 border-t border-sky-100 pt-4 text-xs font-semibold text-kp-subtle sm:flex-row sm:items-center sm:justify-between">
+                <span className="flex items-center gap-2 text-kp-primary-strong">
+                  <CheckCircle2 className="h-4 w-4 text-kp-primary" />
+                  Server timestamps and mutual acceptance enforced
+                </span>
+                <span>KaamProof v2.0</span>
+              </div>
             </div>
-
-            {/* Core Details Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-              <div className="p-4 bg-stone-900/40 rounded-xl border border-stone-700/60">
-                <div className="flex items-center gap-2 text-xs font-semibold text-stone-400 mb-1">
-                  <UserCheck className="w-4 h-4 text-emerald-400" /> Worker Identity
-                </div>
-                <div className="text-lg font-bold text-white">{data.certificate?.workerDisplayName}</div>
-                <div className="text-xs text-stone-400 mt-0.5">{data.certificate?.occupation}</div>
-              </div>
-
-              <div className="p-4 bg-stone-900/40 rounded-xl border border-stone-700/60">
-                <div className="flex items-center gap-2 text-xs font-semibold text-stone-400 mb-1">
-                  <Building2 className="w-4 h-4 text-emerald-400" /> Employer / Household
-                </div>
-                <div className="text-lg font-bold text-white">{data.certificate?.employerDisplayName}</div>
-                <div className="text-xs text-stone-400 mt-0.5">Verified Relationship & Settlement</div>
-              </div>
-            </div>
-
-            {/* Verified Metrics Row */}
-            <div className="grid grid-cols-3 gap-3 mt-4 text-center">
-              <div className="p-3 bg-emerald-950/30 rounded-xl border border-emerald-800/40">
-                <div className="text-2xl font-black text-emerald-400">{data.certificate?.confirmedWorkdays}</div>
-                <div className="text-xs text-stone-400 mt-1">Confirmed Days</div>
-              </div>
-
-              <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-700/60">
-                <div className="text-2xl font-black text-white">{data.certificate?.confirmedHours}</div>
-                <div className="text-xs text-stone-400 mt-1">Confirmed Hours</div>
-              </div>
-
-              <div className="p-3 bg-stone-900/60 rounded-xl border border-stone-700/60">
-                <div className="text-2xl font-black text-stone-300">{data.certificate?.agreedWageRate}</div>
-                <div className="text-xs text-stone-400 mt-1">Agreed Wage</div>
-              </div>
-            </div>
-
-            {/* Validity Period & QR */}
-            <div className="mt-6 pt-6 border-t border-stone-700/80 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="space-y-2 text-sm text-stone-300 w-full sm:w-auto">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-stone-400" />
-                  <span>
-                    Period: <strong className="text-white">{data.certificate?.periodStart}</strong> to{" "}
-                    <strong className="text-white">{data.certificate?.periodEnd}</strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-stone-400" />
-                  <span>
-                    Disputed Sessions:{" "}
-                    <strong className="text-amber-400">{data.certificate?.disputedSessionsCount}</strong>
-                  </span>
-                </div>
-                <div className="text-xs text-stone-400 font-mono break-all mt-2 pt-2 border-t border-stone-800">
-                  SHA-256 Hash: {data.certificate?.canonicalHash}
-                </div>
-              </div>
-
-              {qrSrc && (
-                <div className="p-2 bg-white rounded-xl shadow-lg shrink-0 flex flex-col items-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={qrSrc} alt="Verification QR Code" className="w-28 h-28" />
-                  <span className="text-[10px] font-bold text-stone-800 mt-1 font-mono">SCAN TO VERIFY</span>
-                </div>
-              )}
-            </div>
-
-            {/* Bottom confirmation stamp */}
-            <div className="mt-6 pt-4 border-t border-stone-800 flex items-center justify-between text-xs text-stone-400">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                <CheckCircle2 className="w-4 h-4" /> Server Timestamps & Mutual Acceptance Enforced
-              </span>
-              <span>KaamProof v1.0</span>
-            </div>
-          </div>
+          </section>
         )}
 
-        <div className="mt-6 text-center text-xs text-stone-400">
+        <p className="mt-6 text-center text-xs leading-6 text-kp-subtle">
           Attendance answers: <em>Did you work today?</em> KaamProof answers:{" "}
-          <strong>Can you prove your work history after the job is over?</strong>
-        </div>
+          <strong className="text-kp-primary-strong">Can you prove your work history after the job is over?</strong>
+        </p>
       </div>
+    </div>
+  );
+}
+
+function InfoCard({ icon, label, value, note }: { icon: React.ReactNode; label: string; value?: string; note?: string }) {
+  return (
+    <div className="rounded-lg border border-sky-100 bg-white p-4 shadow-sm">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-kp-subtle">
+        <span className="text-kp-primary">{icon}</span>
+        {label}
+      </div>
+      <div className="mt-2 text-lg font-black text-kp-ink">{value}</div>
+      {note && <div className="mt-1 text-xs font-semibold text-kp-subtle">{note}</div>}
+    </div>
+  );
+}
+
+function Metric({ value, label, tone = "neutral" }: { value?: string | number; label: string; tone?: "neutral" | "primary" }) {
+  return (
+    <div className={`rounded-lg border p-4 text-center ${tone === "primary" ? "border-kp-border bg-sky-50" : "border-sky-100 bg-white"}`}>
+      <div className="text-2xl font-black text-kp-primary-strong">{value}</div>
+      <div className="mt-1 text-xs font-bold text-kp-subtle">{label}</div>
     </div>
   );
 }

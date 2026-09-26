@@ -1,6 +1,7 @@
 // End-to-end API tests. Requires a running server (npm run start) and a migrated database.
 //   BASE_URL=http://127.0.0.1:3000 DATABASE_URL=postgresql://... node tests/api.e2e.mjs
 import pg from "pg";
+import crypto from "crypto";
 
 const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
@@ -292,7 +293,6 @@ check("replayed queued end is idempotent", (await wA.post("/api/work-sessions", 
 check("worker B cannot end A's session via its start key", (await wB.post("/api/work-sessions", { action: "end", startIdempotencyKey: OK })).status === 404);
 
 group("PASSWORD RESET / CHANGE");
-import crypto from "crypto";
 const sha = (t) => crypto.createHash("sha256").update(t).digest("hex");
 const gen = await new Client("x").post("/api/auth/forgot", { email: `nobody.${run}@example.com` });
 const gen2 = await new Client("x").post("/api/auth/forgot", { email: wB.email });

@@ -18,12 +18,12 @@ export const metadata: Metadata = {
   twitter: { card: "summary", title: "KaamProof", description: "Worker-owned digital work records." },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#14352a" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#174D3A" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-stone-950 text-stone-100 antialiased">{children}</body>
+      <body className="bg-white text-slate-900 antialiased">{children}</body>
     </html>
   );
 }

@@ -15,6 +15,20 @@
       "when": 1790016550019,
       "tag": "0001_password_resets",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790165588384,
+      "tag": "0002_otp_auth",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790417302539,
+      "tag": "0003_typical_talisman",
+      "breakpoints": true
     }
   ]
 }

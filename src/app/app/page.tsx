@@ -58,14 +58,17 @@ export default function KaamProofApp() {
   const [profile, setProfile] = useState<WorkerProfile | null>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
 
-  // Auth Login / Registration Form State
-  const [authMode, setAuthMode] = useState<"login" | "register" | "forgot">("login");
+  // Password-only authentication form state.
+  const [authMode, setAuthMode] = useState<"login" | "register" | "phone" | "otp">("login");
   const [selectedAuthRole, setSelectedAuthRole] = useState<"worker" | "employer">("worker");
-  const [authEmail, setAuthEmail] = useState<string>("");
-  const [authPassword, setAuthPassword] = useState<string>("");
+  const [authPhone, setAuthPhone] = useState<string>("");
+  const [authOtp, setAuthOtp] = useState<string>("");
+  const [authResendCooldown, setAuthResendCooldown] = useState<number>(0);
   const [authName, setAuthName] = useState<string>("");
-  const [authSkillOrCompany, setAuthSkillOrCompany] = useState<string>("");
-  const [authCity, setAuthCity] = useState<string>("New Delhi");
+  const [authPassword, setAuthPassword] = useState<string>("");
+  const [authConfirmPassword, setAuthConfirmPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Navigation Tabs
   // For Worker: 'home' | 'history' | 'paisa' | 'passport' | 'disputes' | 'profile'
@@ -205,58 +208,100 @@ export default function KaamProofApp() {
     setProfile(data.profile ?? null);
     setActiveTab("home");
     setEmployerWorkspaceMode("employer");
-    setAuthPassword("");
+    setEmployerWorkspaceMode("employer");
     restoreOfflineQueue(data.user.id);
     confetti({ particleCount: 55, spread: 70, origin: { y: 0.7 } });
     showToast(welcome, "success");
     await refreshAllData(SESSION_MARKER, data.user);
   };
 
-  // Login / Register (email + password; server sets an HttpOnly cookie)
+  // Phone + OTP Flow (server sets an HttpOnly cookie on verify)
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (authMode === "forgot") {
-      if (!authEmail.trim()) return;
+
+    if (authMode === "login" || authMode === "register") {
+      if (!authPhone.trim() || !authPassword) {
+        showToast("Enter your mobile number and password.", "error");
+        return;
+      }
+      if (authMode === "register" && (!authName.trim() || authPassword !== authConfirmPassword)) {
+        showToast(!authName.trim() ? "Enter your name." : "Passwords do not match.", "error");
+        return;
+      }
       try {
         setActionLoading(true);
-        const r = await fetch("/api/auth/forgot", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: authEmail.trim() }) });
-        const d = await r.json();
-        showToast(d.message_hi || d.message_en || "Request sent", r.ok ? "success" : "error");
-        if (r.ok) setAuthMode("login");
+        const res = await fetch(authMode === "register" ? "/api/auth/register" : "/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: authPhone.trim(), password: authPassword, confirmPassword: authConfirmPassword, name: authName.trim(), role: selectedAuthRole }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message_hi || data.message_en || data.error || "Authentication failed");
+        await startSession(data, authMode === "register" ? "Account created successfully." : `Welcome back, ${data.user.name}!`);
+      } catch (err) {
+        showToast((err as Error).message, "error");
       } finally {
         setActionLoading(false);
       }
       return;
     }
-    if (!authEmail.trim() || !authPassword) {
-      showToast("कृपया ईमेल और पासवर्ड दर्ज करें", "error");
-      return;
-    }
-    try {
-      setActionLoading(true);
-      const isRegister = authMode === "register";
-      const res = await fetch(isRegister ? "/api/auth/register" : "/api/auth/login", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          isRegister
-            ? { role: selectedAuthRole, name: authName.trim(), email: authEmail.trim(), password: authPassword, occupationOrCompany: authSkillOrCompany.trim(), locationCity: authCity.trim() }
-            : { email: authEmail.trim(), password: authPassword }
-        ),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        showToast(data.message_hi || data.message_en || "Failed", "error");
+    
+    if (false && authMode === "phone") {
+      if (!authPhone.trim()) {
+        showToast("कृपया मोबाइल नंबर दर्ज करें", "error");
         return;
       }
-      await startSession(data, `स्वागत है, ${data.user.name}!`);
-    } catch (err) {
-      showToast((err as Error).message, "error");
-    } finally {
-      setActionLoading(false);
+      try {
+        setActionLoading(true);
+        const res = await fetch("/api/auth/otp/request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: authPhone.trim(), role: selectedAuthRole }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message_hi || data.message_en || "Failed to send OTP");
+        
+        showToast(data.message_hi || data.message_en || "OTP sent successfully", "success");
+        setAuthMode("otp");
+        setAuthResendCooldown(45); // 45 seconds cooldown
+      } catch (err) {
+        showToast((err as Error).message, "error");
+      } finally {
+        setActionLoading(false);
+      }
+      return;
+    }
+
+    if (false && authMode === "otp") {
+      if (!authOtp.trim() || authOtp.length !== 6) {
+        showToast("कृपया 6-अंकीय OTP दर्ज करें", "error");
+        return;
+      }
+      try {
+        setActionLoading(true);
+        const res = await fetch("/api/auth/otp/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: authPhone.trim(), otp: authOtp.trim(), role: selectedAuthRole }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message_hi || data.message_en || "Failed to verify OTP");
+        
+        await startSession(data, `स्वागत है, ${data.user.name}!`);
+      } catch (err) {
+        showToast((err as Error).message, "error");
+      } finally {
+        setActionLoading(false);
+      }
     }
   };
+
+  useEffect(() => {
+    if (authResendCooldown > 0) {
+      const timer = setTimeout(() => setAuthResendCooldown(c => c - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [authResendCooldown]);
 
   // Logout (revokes the server session and clears the cookie)
   const handleLogout = async () => {
@@ -849,16 +894,16 @@ export default function KaamProofApp() {
 
   if (!user || !accessToken) {
     return (
-      <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col justify-between font-sans selection:bg-emerald-500 selection:text-white">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white">
         {/* Top Bar */}
-        <header className="border-b border-stone-800 bg-stone-900/80 px-6 py-4 flex items-center justify-between">
+        <header className="border-b border-slate-200 bg-white/90 backdrop-blur-xl px-5 py-4 sm:px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-emerald-950">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-blue-600/20">
               क
             </div>
             <div>
-              <span className="text-xl font-black tracking-tight text-white">KaamProof</span>
-              <span className="block text-xs text-stone-400">
+              <span className="text-xl font-black tracking-tight text-slate-950">KaamProof</span>
+              <span className="block text-xs text-slate-500">
                 Worker-Owned Proof-of-Work & Wage Record Platform
               </span>
             </div>
@@ -866,7 +911,8 @@ export default function KaamProofApp() {
 
           <button
             onClick={() => setLang(lang === "hi" ? "en" : "hi")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 border border-stone-700 text-xs text-emerald-300 font-semibold transition-colors"
+            aria-label="Change language"
+            className="flex min-h-11 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-blue-700 shadow-sm transition-colors hover:border-blue-300 hover:bg-blue-50"
           >
             <Languages className="w-4 h-4" />
             <span>{lang === "hi" ? "English" : "हिंदी"}</span>
@@ -897,45 +943,45 @@ export default function KaamProofApp() {
         )}
 
         {/* Main Login / Registration Card */}
-        <main className="flex-1 flex items-center justify-center p-4 sm:p-8">
-          <div className="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <main className="flex-1 flex items-center justify-center px-5 py-10 sm:px-8 lg:py-16">
+          <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-[0.92fr_1.08fr] gap-10 lg:gap-16 items-center">
             {/* Left Info Column */}
-            <div className="lg:col-span-5 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
                 <ShieldCheck className="w-4 h-4" />
-                <span>Real OTP & Email Authentication</span>
+                <span>Secure password authentication</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+              <h1 className="max-w-xl text-4xl font-black leading-[1.08] tracking-tight text-slate-950 sm:text-5xl">
                 {lang === "hi"
                   ? "अपने काम और वेतन का पक्का डिजिटल प्रमाण बनाएं"
-                  : "Own Your Verified Work & Wage History"}
+                  : "Own your verified work history"}
               </h1>
 
-              <p className="text-sm text-stone-400 leading-relaxed">
+              <p className="max-w-lg text-base leading-7 text-slate-600">
                 {lang === "hi"
                   ? "नया श्रमिक (Worker) या नियोक्ता (Employer) खाता बनाएं। श्रमिक को केवल अपना व्यक्तिगत कार्य एवं वेतन डेटा दिखेगा, जबकि नियोक्ता के पास हाजिरी पुष्टि एवं एडमिन ऑडिट पैनल का पूर्ण अधिकार होगा।"
-                  : "Register or sign in with your email and password. Workers only ever see their own records; employers only see their own workers."}
+                  : "Sign in as a worker or employer to manage work sessions, payments, agreements and certificates in one secure place."}
               </p>
 
-              <div className="space-y-3 pt-2">
-                <div className="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800 flex items-start gap-3">
-                  <User className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="grid gap-3 pt-2 sm:grid-cols-2 lg:grid-cols-1">
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex items-start gap-3">
+                  <User className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                   <div className="text-xs">
-                    <strong className="text-white block">श्रमिक खाता (Worker Account)</strong>
-                    <span className="text-stone-400">
+                    <strong className="block text-sm text-slate-900">श्रमिक खाता (Worker Account)</strong>
+                    <span className="text-slate-500">
                       केवल आपका अपना काम (Kaam Shuru / Khatam), वेतन बहीखाता, वर्क पासपोर्ट और क्यूआर प्रमाणपत्र।
                     </span>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-stone-900/70 border border-stone-800 flex items-start gap-3">
-                  <Building className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex items-start gap-3">
+                  <Building className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                   <div className="text-xs">
-                    <strong className="text-white block">
+                    <strong className="block text-sm text-slate-900">
                       नियोक्ता खाता (Employer)
                     </strong>
-                    <span className="text-stone-400">
+                    <span className="text-slate-500">
                       श्रमिकों की हाजिरी पुष्टि, वेतन भुगतान, एआई विसंगति जांच (AI Anomaly Triage) और विवाद समाधान।
                     </span>
                   </div>
@@ -944,10 +990,10 @@ export default function KaamProofApp() {
             </div>
 
             {/* Right Auth Card */}
-            <div className="lg:col-span-7 bg-stone-900 border border-stone-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/10 sm:p-9 space-y-7">
               {/* Role Selector Toggle */}
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-stone-400 block mb-2">
+                  <label className="mb-3 block text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
                   1. अपनी भूमिका चुनें (Select Your Account Type)
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -958,22 +1004,22 @@ export default function KaamProofApp() {
                     }}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedAuthRole === "worker"
-                        ? "bg-emerald-950/70 border-emerald-500 text-white shadow-lg shadow-emerald-950/50"
-                        : "bg-stone-950 border-stone-800 text-stone-400 hover:border-stone-700"
+                        ? "bg-blue-50 border-blue-600 text-slate-950 shadow-md shadow-blue-600/10"
+                        : "bg-slate-50 border-slate-200 text-slate-500 hover:border-blue-300"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <User
                         className={`w-5 h-5 ${
-                          selectedAuthRole === "worker" ? "text-emerald-400" : "text-stone-500"
+                          selectedAuthRole === "worker" ? "text-blue-600" : "text-slate-400"
                         }`}
                       />
                       {selectedAuthRole === "worker" && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                         <CheckCircle2 className="w-4 h-4 text-blue-600" />
                       )}
                     </div>
                     <div className="font-bold text-sm">श्रमिक (Worker)</div>
-                    <div className="text-[11px] text-stone-400 mt-0.5">
+                       <div className="mt-1 text-[11px] text-slate-500">
                       Personal Work & Wage Record
                     </div>
                   </button>
@@ -985,22 +1031,22 @@ export default function KaamProofApp() {
                     }}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedAuthRole === "employer"
-                        ? "bg-emerald-950/70 border-emerald-500 text-white shadow-lg shadow-emerald-950/50"
-                        : "bg-stone-950 border-stone-800 text-stone-400 hover:border-stone-700"
+                        ? "bg-blue-50 border-blue-600 text-slate-950 shadow-md shadow-blue-600/10"
+                        : "bg-slate-50 border-slate-200 text-slate-500 hover:border-blue-300"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <Building
                         className={`w-5 h-5 ${
-                          selectedAuthRole === "employer" ? "text-emerald-400" : "text-stone-500"
+                          selectedAuthRole === "employer" ? "text-blue-600" : "text-slate-400"
                         }`}
                       />
                       {selectedAuthRole === "employer" && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                         <CheckCircle2 className="w-4 h-4 text-blue-600" />
                       )}
                     </div>
                     <div className="font-bold text-sm">नियोक्ता (Employer)</div>
-                    <div className="text-[11px] text-stone-400 mt-0.5">
+                      <div className="mt-1 text-[11px] text-slate-500">
                       Employer Portal
                     </div>
                   </button>
@@ -1008,72 +1054,82 @@ export default function KaamProofApp() {
               </div>
 
               <form onSubmit={handleAuthSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-2" role="tablist">
-                  {(["login", "register"] as const).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      role="tab"
-                      aria-selected={authMode === m}
-                      onClick={() => setAuthMode(m)}
-                      className={`py-2.5 rounded-xl text-sm font-bold border ${authMode === m ? "bg-emerald-600 border-emerald-500 text-white" : "bg-stone-950 border-stone-800 text-stone-300"}`}
-                    >
-                      {m === "login" ? "लॉगिन (Login)" : "नया खाता (Register)"}
+                {authMode === "login" || authMode === "register" ? (
+                  <>
+                    {authMode === "register" && (
+                      <div>
+                        <label htmlFor="kp-name" className="mb-2 block text-sm font-bold text-slate-800">Full name</label>
+                        <input id="kp-name" type="text" required value={authName} onChange={(e) => setAuthName(e.target.value)} placeholder="Your name" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10" />
+                      </div>
+                    )}
+                    <div>
+                      <label htmlFor="kp-phone" className="text-xs font-semibold text-stone-300 block mb-1.5">मोबाइल नंबर (Mobile Number) *</label>
+                      <div className="flex overflow-hidden rounded-xl border border-slate-200 bg-slate-50 focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/10">
+                        <span className="border-r border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-500">+91</span>
+                        <input id="kp-phone" type="tel" required minLength={10} maxLength={10} placeholder="9876543210" value={authPhone} onChange={(e) => setAuthPhone(e.target.value.replace(/\D/g, ''))}
+                          className="w-full bg-transparent px-4 py-3 text-sm font-medium tracking-widest text-slate-900 focus:outline-none" />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="kp-password" className="mb-2 block text-sm font-bold text-slate-800">Password</label>
+                      <div className="relative">
+                        <input id="kp-password" type={showPassword ? "text" : "password"} required minLength={8} autoComplete={authMode === "register" ? "new-password" : "current-password"} value={authPassword} onChange={(e) => setAuthPassword(e.target.value)} placeholder="At least 8 characters" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm text-slate-900 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10" />
+                        <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)} className="absolute right-2 top-1/2 min-h-9 -translate-y-1/2 rounded-lg px-2 text-xs font-bold text-blue-700 hover:bg-blue-50">{showPassword ? "Hide" : "Show"}</button>
+                      </div>
+                    </div>
+                    {authMode === "register" && (
+                      <div>
+                        <label htmlFor="kp-confirm-password" className="mb-2 block text-sm font-bold text-slate-800">Confirm password</label>
+                        <div className="relative">
+                          <input id="kp-confirm-password" type={showConfirmPassword ? "text" : "password"} required minLength={8} autoComplete="new-password" value={authConfirmPassword} onChange={(e) => setAuthConfirmPassword(e.target.value)} placeholder="Re-enter your password" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm text-slate-900 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10" />
+                          <button type="button" aria-label={showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"} onClick={() => setShowConfirmPassword((value) => !value)} className="absolute right-2 top-1/2 min-h-9 -translate-y-1/2 rounded-lg px-2 text-xs font-bold text-blue-700 hover:bg-blue-50">{showConfirmPassword ? "Hide" : "Show"}</button>
+                        </div>
+                      </div>
+                    )}
+                    <button type="submit" disabled={actionLoading} data-auth-submit={authMode}
+                       className="auth-submit flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-black tracking-wide text-white transition-colors hover:bg-blue-700 cursor-pointer disabled:opacity-50">
+                      <Lock className="w-4 h-4" />
+                      <span>{actionLoading ? "कृपया प्रतीक्षा करें..." : "OTP भेजें (Send OTP)"}</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
-                  ))}
-                </div>
-
-                {authMode === "register" && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label htmlFor="kp-name" className="text-xs font-semibold text-stone-300 block mb-1.5">पूरा नाम (Full Name) *</label>
-                      <input id="kp-name" type="text" required minLength={2} maxLength={80} value={authName} onChange={(e) => setAuthName(e.target.value)}
-                        className="w-full px-3.5 py-3 rounded-xl bg-stone-950 border border-stone-800 text-white focus:outline-none focus:border-emerald-500 text-sm" />
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center mb-6">
+                      <p className="text-sm text-stone-300">Enter the 6-digit OTP sent to</p>
+                      <p className="text-base font-bold tracking-wider text-white mt-1">+91 {authPhone}</p>
                     </div>
                     <div>
-                      <label htmlFor="kp-occ" className="text-xs font-semibold text-stone-300 block mb-1.5">
-                        {selectedAuthRole === "worker" ? "काम / हुनर (Occupation)" : "परिवार / संस्थान का नाम (Household/Firm)"}
-                      </label>
-                      <input id="kp-occ" type="text" maxLength={120} value={authSkillOrCompany} onChange={(e) => setAuthSkillOrCompany(e.target.value)}
-                        className="w-full px-3.5 py-3 rounded-xl bg-stone-950 border border-stone-800 text-white focus:outline-none focus:border-emerald-500 text-sm" />
+                      <label htmlFor="kp-otp" className="text-xs font-semibold text-stone-300 block mb-1.5 text-center">OTP</label>
+                      <input id="kp-otp" type="text" inputMode="numeric" required minLength={6} maxLength={6} placeholder="• • • • • •" autoFocus value={authOtp} onChange={(e) => setAuthOtp(e.target.value.replace(/\D/g, ''))}
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-4 text-center text-2xl font-black tracking-[0.5em] text-slate-950 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10" />
                     </div>
-                  </div>
+                    <button type="submit" disabled={actionLoading}
+                       className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-black tracking-wide text-white transition-colors hover:bg-blue-700 cursor-pointer disabled:opacity-50">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>{actionLoading ? "सत्यापित कर रहा है..." : "सत्यापित करें (Verify & Continue)"}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                    
+                    <div className="flex justify-between items-center mt-4">
+                      <button type="button" onClick={() => { setAuthMode("phone"); setAuthOtp(""); }} className="text-xs text-stone-400 underline cursor-pointer p-2">
+                        ← वापस (Back)
+                      </button>
+                      <button type="button" disabled={authResendCooldown > 0 || actionLoading} onClick={() => { setAuthMode("phone"); handleAuthSubmit(new Event('submit') as unknown as React.FormEvent); }} className="text-xs text-emerald-400 underline cursor-pointer p-2 disabled:opacity-50 disabled:no-underline">
+                        {authResendCooldown > 0 ? `Resend OTP in ${authResendCooldown}s` : "पुनः भेजें (Resend OTP)"}
+                      </button>
+                    </div>
+                  </>
                 )}
-
-                <div>
-                  <label htmlFor="kp-email" className="text-xs font-semibold text-stone-300 block mb-1.5">ईमेल (Email) *</label>
-                  <input id="kp-email" type="email" required autoComplete="email" value={authEmail} onChange={(e) => setAuthEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-stone-950 border border-stone-800 text-white focus:outline-none focus:border-emerald-500 text-sm" />
-                </div>
-                {authMode !== "forgot" && (
-                <div>
-                  <label htmlFor="kp-pass" className="text-xs font-semibold text-stone-300 block mb-1.5">
-                    पासवर्ड (Password) * {authMode === "register" && <span className="text-stone-500 font-normal">— कम से कम 10 अक्षर, अक्षर + अंक</span>}
-                  </label>
-                  <input id="kp-pass" type="password" required minLength={authMode === "register" ? 10 : 1} autoComplete={authMode === "register" ? "new-password" : "current-password"}
-                    value={authPassword} onChange={(e) => setAuthPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-stone-950 border border-stone-800 text-white focus:outline-none focus:border-emerald-500 text-sm" />
-                </div>
-                )}
-                {authMode === "login" && (
-                  <button type="button" onClick={() => setAuthMode("forgot")} className="text-xs text-emerald-400 underline cursor-pointer min-h-11">पासवर्ड भूल गए? (Forgot password)</button>
-                )}
-                {authMode === "forgot" && (
-                  <button type="button" onClick={() => setAuthMode("login")} className="text-xs text-stone-400 underline cursor-pointer min-h-11">← वापस लॉगिन पर</button>
-                )}
-
-                <button type="submit" disabled={actionLoading}
-                  className="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-black text-sm tracking-wide transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
-                  <KeyRound className="w-4 h-4" />
-                  <span>{actionLoading ? "कृपया प्रतीक्षा करें..." : authMode === "login" ? "लॉगिन करें (Login)" : authMode === "forgot" ? "रीसेट लिंक भेजें (Send reset link)" : "खाता बनाएं (Create account)"}</span>
-                  <ArrowRight className="w-4 h-4" />
+                <button type="button" onClick={() => { setAuthMode(authMode === "login" ? "register" : "login"); setAuthPassword(""); setAuthConfirmPassword(""); }} className="w-full min-h-11 text-sm font-bold text-blue-700 hover:underline">
+                  {authMode === "login" ? "New here? Create an account" : "Already have an account? Log in"}
                 </button>
               </form>
             </div>
           </div>
         </main>
 
-        <footer className="border-t border-stone-900 bg-stone-950 px-4 py-4 text-center text-xs text-stone-500">
+        <footer className="border-t border-slate-200 bg-white px-4 py-4 text-center text-xs text-slate-500">
           KaamProof — digital work record. Not legal proof, not a payment service.
         </footer>
       </div>
@@ -1087,11 +1143,18 @@ export default function KaamProofApp() {
   const isEmployerOrAdmin = user.role === "employer";
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="kp-dashboard min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+      <header className="mobile-app-bar md:hidden">
+        <div className="mobile-brand-mark">क</div>
+        <span className="mobile-brand-name">KaamProof</span>
+        <button type="button" aria-label="Open profile" onClick={() => setActiveTab("profile")} className="mobile-profile-button">
+          <User className="h-5 w-5" />
+        </button>
+      </header>
       {/* Top Authenticated Security Bar */}
-      <header className="bg-stone-900 border-b border-stone-800 px-4 sm:px-8 py-2 flex flex-wrap items-center justify-between text-xs gap-3">
+      <header className="hidden md:flex bg-stone-900 border-b border-stone-800 px-4 sm:px-8 py-2 flex-wrap items-center justify-between text-xs gap-3">
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-400 border border-emerald-700 uppercase tracking-wider text-[10px] flex items-center gap-1">
+          <span className="flex items-center gap-1 rounded-full border border-kp-border bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-kp-primary">
             <Lock className="w-3 h-3" />{" "}
             {isWorker ? "WORKER ACCOUNT (ISOLATED DATA)" : "EMPLOYER + ADMIN ACCESS"}
           </span>
@@ -1135,15 +1198,15 @@ export default function KaamProofApp() {
       </header>
 
       {/* Main Navigation Header */}
-      <nav className="bg-stone-900/95 border-b border-stone-800 sticky top-0 z-30 backdrop-blur-md px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <nav className="hidden md:flex bg-stone-900/95 border-b border-stone-800 sticky top-0 z-30 backdrop-blur-md px-4 sm:px-8 py-3.5 flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-emerald-950">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-blue-600/20">
             क
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xl font-black tracking-tight text-white">{t.appName}</span>
-              <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-stone-800 text-emerald-400 border border-stone-700">
+              <span className="text-xl font-black tracking-tight text-slate-950">{t.appName}</span>
+              <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
                 {isWorker ? "श्रमिक पोर्टल" : "नियोक्ता पोर्टल"}
               </span>
             </div>
@@ -1206,7 +1269,7 @@ export default function KaamProofApp() {
       )}
 
       {/* Main Content Container */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full p-4 pb-24 sm:p-6 sm:pb-6 lg:p-8">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
             <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -1227,8 +1290,8 @@ export default function KaamProofApp() {
             {isWorker && (
               <div className="space-y-6">
                 {/* Worker Navigation Bar */}
-                <div className="flex items-center justify-between border-b border-stone-800 pb-3 overflow-x-auto gap-2">
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="worker-desktop-nav flex flex-col gap-3 border-b border-stone-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center sm:gap-2 lg:grid-cols-none">
                     {[
                       { id: "home", label: lang === "hi" ? "होम (Home)" : "Home", icon: Play },
                       {
@@ -1263,7 +1326,7 @@ export default function KaamProofApp() {
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
-                          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                            className={`flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all cursor-pointer sm:justify-start sm:rounded-xl sm:px-3.5 sm:text-sm ${
                             isActive
                               ? "bg-emerald-600/20 text-emerald-300 border border-emerald-500/40"
                               : "text-stone-400 hover:text-stone-200 hover:bg-stone-900"
@@ -1310,6 +1373,20 @@ export default function KaamProofApp() {
                 {/* WORKER TAB 1: HOME */}
                 {activeTab === "home" && (
                   <div className="space-y-6">
+                    <div className="mobile-home-intro md:hidden">
+                      <p className="mobile-eyebrow">{lang === "hi" ? "आपका काम रिकॉर्ड" : "Your work record"}</p>
+                      <h1>{lang === "hi" ? `नमस्ते, ${user.name}` : `Hello, ${user.name}`}</h1>
+                      <p>{lang === "hi" ? "आज का काम रिकॉर्ड करें" : "Record today's work"}</p>
+                    </div>
+                    {relationships.length > 0 && (
+                      <div className="mobile-employer-card md:hidden">
+                        <div>
+                          <p className="mobile-card-label">{lang === "hi" ? "आपका नियोक्ता" : "Your employer"}</p>
+                          <strong>{relationships[0].employerName || "Connected employer"}</strong>
+                        </div>
+                        <span className="mobile-connected"><CheckCircle2 className="h-4 w-4" /> Connected</span>
+                      </div>
+                    )}
                     {metrics?.activeSession || queuedOpenStart ? (
                       <div className="bg-amber-950/40 border border-amber-600/50 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 animate-pulse">
                         <div className="flex items-center gap-3">
@@ -1348,7 +1425,7 @@ export default function KaamProofApp() {
                     ) : (
                       <div className="bg-gradient-to-b from-stone-900 to-stone-900/60 border border-stone-800 rounded-3xl p-6 sm:p-10 text-center shadow-2xl">
                         <div className="max-w-xl mx-auto space-y-4">
-                          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                          <div className="inline-flex items-center gap-2 rounded-full border border-kp-border bg-white px-3 py-1 text-xs font-semibold text-kp-primary">
                             <ShieldCheck className="w-3.5 h-3.5" />
                             <span>प्रमाणित कार्य सत्र (Verified Work Session)</span>
                           </div>
@@ -1365,7 +1442,7 @@ export default function KaamProofApp() {
                             <button
                               disabled={actionLoading}
                               onClick={handleStartWork}
-                              className="w-full sm:w-auto px-12 py-5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-stone-950 font-black text-xl tracking-wide shadow-2xl shadow-emerald-900/60 transition-all transform active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-3 mx-auto"
+                              className="mx-auto flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-kp-primary px-6 py-4 text-base font-bold tracking-wide text-white shadow-sm transition-colors hover:bg-kp-primary-strong active:scale-[0.99] cursor-pointer disabled:opacity-50 sm:w-auto sm:px-12 sm:py-5 sm:text-xl"
                             >
                               <Play className="w-7 h-7 fill-current" />
                               <span>{t.startWork} (Kaam Shuru)</span>
@@ -2407,6 +2484,22 @@ export default function KaamProofApp() {
             </div>
           </form>
         </div>
+      )}
+
+      {isWorker && (
+        <nav className="mobile-bottom-nav md:hidden" aria-label="Primary navigation">
+          {[
+            { id: "home", label: "Home", icon: Play },
+            { id: "history", label: "Work", icon: History },
+            { id: "paisa", label: "Pay", icon: DollarSign },
+            { id: "passport", label: "Passport", icon: Award },
+            { id: "profile", label: "More", icon: User },
+          ].map((item) => {
+            const Icon = item.icon;
+            const active = activeTab === item.id;
+            return <button key={item.id} type="button" onClick={() => setActiveTab(item.id)} className={active ? "active" : ""} aria-current={active ? "page" : undefined}><Icon className="h-5 w-5" /><span>{item.label}</span></button>;
+          })}
+        </nav>
       )}
 
       {/* Footer */}

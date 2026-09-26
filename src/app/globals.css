@@ -1,1 +1,365 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --color-kp-primary: #174d3a;
+  --color-kp-primary-strong: #123f30;
+  --color-kp-secondary: #7a8f45;
+  --color-kp-accent: #c59a45;
+  --color-kp-bg: #f7f7f2;
+  --color-kp-surface: #ffffff;
+  --color-kp-muted: #f0f1eb;
+  --color-kp-border: #d5dad3;
+  --color-kp-ink: #17211b;
+  --color-kp-subtle: #4f5b53;
+}
+
+:root {
+  color-scheme: light;
+  --kp-ring: #174d3a;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #f7f7f2;
+  color: #17211b;
+  font-family: var(--font-sans);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 180ms;
+  transition-timing-function: ease-out;
+}
+
+button:not(:disabled),
+a[href],
+summary {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--kp-ring);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #174d3a;
+  color: #ffffff;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+.auth-submit > span {
+  font-size: 0;
+}
+
+.auth-submit > span::after {
+  content: "Log in";
+  font-size: 0.875rem;
+}
+
+.auth-submit[data-auth-submit="register"] > span::after {
+  content: "Create account";
+}
+
+/* Principal KaamProof design tokens */
+:root {
+  --background: #f7f7f2;
+  --surface: #ffffff;
+  --surface-subtle: #f0f1eb;
+  --foreground: #17211b;
+  --secondary-text: #4f5b53;
+  --muted-text: #78827b;
+  --primary: #174d3a;
+  --primary-hover: #123f30;
+  --secondary: #7a8f45;
+  --accent: #c59a45;
+  --success: #287a52;
+  --warning: #b7791f;
+  --destructive: #b8423a;
+  --info: #356b8c;
+  --border-subtle: #e5e8e2;
+  --border-default: #d5dad3;
+  --border-active: #174d3a;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+}
+
+button,
+a {
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Bring legacy utility markup onto the master palette. */
+.bg-blue-600,
+.bg-blue-700 {
+  background-color: var(--primary) !important;
+}
+
+.bg-sky-700,
+.bg-sky-800 {
+  background-color: var(--primary) !important;
+}
+
+.hover\:bg-sky-800:hover {
+  background-color: var(--primary-hover) !important;
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: var(--primary-hover) !important;
+}
+
+.text-blue-600,
+.text-blue-700,
+.text-blue-800 {
+  color: var(--primary) !important;
+}
+
+.border-blue-200,
+.border-blue-300,
+.border-slate-200,
+.border-sky-100 {
+  border-color: var(--border-default) !important;
+}
+
+.bg-blue-50,
+.bg-slate-50,
+.bg-sky-50,
+.bg-sky-50\/70 {
+  background-color: var(--surface-subtle) !important;
+}
+
+.text-slate-950,
+.text-slate-900 {
+  color: var(--foreground) !important;
+}
+
+.text-slate-600,
+.text-slate-500,
+.text-sky-700 {
+  color: var(--secondary-text) !important;
+}
+
+.rounded-3xl {
+  border-radius: var(--radius-xl) !important;
+}
+
+.rounded-2xl {
+  border-radius: var(--radius-lg) !important;
+}
+
+.rounded-xl,
+.rounded-lg {
+  border-radius: var(--radius-md) !important;
+}
+
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: 0 4px 12px rgb(23 33 27 / 0.07) !important;
+}
+
+/* Status pills remain light; only actionable primary buttons use forest green. */
+.kp-dashboard [class*="bg-emerald-950"],
+.kp-dashboard [class*="bg-emerald-900"] {
+  background-color: #ffffff !important;
+  color: var(--primary) !important;
+}
+
+.kp-dashboard [class*="bg-emerald-950"] *,
+.kp-dashboard [class*="bg-emerald-900"] * {
+  color: var(--primary) !important;
+}
+
+.kp-dashboard [class*="bg-emerald-600"],
+.kp-dashboard [class*="bg-emerald-700"],
+.kp-dashboard [class*="bg-emerald-500"] {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.kp-dashboard [class*="bg-emerald-600"] svg,
+.kp-dashboard [class*="bg-emerald-700"] svg,
+.kp-dashboard [class*="bg-emerald-500"] svg {
+  color: #ffffff !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Authenticated workspace: keeps the same calm, professional system as the login screen. */
+.kp-dashboard .bg-stone-950,
+.kp-dashboard .bg-stone-900,
+.kp-dashboard .bg-stone-900\/95,
+.kp-dashboard .bg-stone-900\/60,
+.kp-dashboard .bg-stone-900\/70 {
+  background-color: #ffffff !important;
+}
+
+.kp-dashboard .bg-stone-950\/80,
+.kp-dashboard .bg-stone-800,
+.kp-dashboard .bg-stone-800\/80 {
+  background-color: #f8fafc !important;
+}
+
+.kp-dashboard .bg-emerald-950,
+.kp-dashboard .bg-emerald-900,
+.kp-dashboard .bg-red-950,
+.kp-dashboard .bg-amber-950 {
+  background-color: #eff6ff !important;
+}
+
+.kp-dashboard .text-stone-100,
+.kp-dashboard .text-white,
+.kp-dashboard .text-stone-200,
+.kp-dashboard .text-stone-300 {
+  color: #0f172a !important;
+}
+
+.kp-dashboard .text-stone-400,
+.kp-dashboard .text-stone-500 {
+  color: #64748b !important;
+}
+
+.kp-dashboard .border-stone-800,
+.kp-dashboard .border-stone-700,
+.kp-dashboard .border-stone-900 {
+  border-color: #e2e8f0 !important;
+}
+
+.kp-dashboard .text-emerald-400,
+.kp-dashboard .text-emerald-300 {
+  color: var(--primary) !important;
+}
+
+.kp-dashboard .bg-emerald-600,
+.kp-dashboard .bg-emerald-500 {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.kp-dashboard .bg-blue-600,
+.kp-dashboard .bg-blue-700 {
+  color: #ffffff !important;
+}
+
+.kp-dashboard .hover\:bg-emerald-500:hover,
+.kp-dashboard .hover\:bg-emerald-400:hover,
+.kp-dashboard .hover\:bg-emerald-600:hover {
+  background-color: var(--primary-hover) !important;
+}
+
+.kp-dashboard .border-emerald-700,
+.kp-dashboard .border-emerald-800,
+.kp-dashboard .border-emerald-600 {
+  border-color: #bfdbfe !important;
+}
+
+.kp-dashboard main {
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.kp-dashboard button,
+.kp-dashboard [role="button"] {
+  min-height: 44px;
+}
+
+/* Legacy dashboard utilities are still present in the large portal component.
+   Normalize them at the workspace boundary until the portal is split into
+   smaller token-based components. */
+.kp-dashboard [class*="bg-stone-"] {
+  background-color: #ffffff !important;
+}
+
+.kp-dashboard [class*="text-stone-"] {
+  color: #475569 !important;
+}
+
+.kp-dashboard [class*="border-stone-"] {
+  border-color: #e2e8f0 !important;
+}
+
+.kp-dashboard [class*="bg-gradient-to-"] {
+  background-image: none !important;
+  background-color: #ffffff !important;
+}
+
+.kp-dashboard [class*="from-emerald-"],
+.kp-dashboard [class*="to-teal-"] {
+  --tw-gradient-from: var(--primary) !important;
+  --tw-gradient-to: var(--primary-hover) !important;
+}
+
+.kp-dashboard [class*="bg-emerald-"] {
+  background-color: var(--primary) !important;
+}
+
+.kp-dashboard [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+/* Primary actions must keep accessible white-on-forest contrast. */
+.kp-dashboard .bg-kp-primary,
+.kp-dashboard .bg-kp-primary * {
+  color: #ffffff !important;
+}
+
+.kp-dashboard .bg-blue-600,
+.kp-dashboard .bg-blue-700,
+.kp-dashboard [class*="bg-emerald-600"] {
+  color: #ffffff !important;
+}
+
+@media (max-width: 767px) {
+  .kp-dashboard { background: var(--canvas) !important; font-size: 16px; }
+  .kp-dashboard main { width: 100%; }
+  .mobile-app-bar { position: sticky; top: 0; z-index: 40; min-height: 60px; display: flex; align-items: center; gap: 10px; padding: max(8px, env(safe-area-inset-top)) 16px 8px; background: #fff; border-bottom: 1px solid var(--border); }
+  .mobile-brand-mark { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 10px; background: var(--primary); color: #fff; font-size: 20px; font-weight: 900; }
+  .mobile-brand-name { color: var(--ink); font-size: 18px; font-weight: 900; }
+  .mobile-profile-button { display: grid; width: 44px; height: 44px; margin-left: auto; place-items: center; border: 1px solid var(--border); border-radius: 50%; color: var(--primary); background: #fff; }
+  .mobile-bottom-nav { position: fixed; right: 0; bottom: 0; left: 0; z-index: 45; display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; padding: 6px 8px max(8px, env(safe-area-inset-bottom)); background: rgba(255,255,255,.97); border-top: 1px solid var(--border); box-shadow: 0 -4px 18px rgba(23,77,58,.08); }
+  .mobile-bottom-nav button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 3px; flex-direction: column; border: 0; border-radius: 10px; color: var(--subtle); background: transparent; font-size: 11px; font-weight: 700; }
+  .mobile-bottom-nav button.active { color: var(--primary); background: var(--muted); }
+  .worker-desktop-nav { display: none !important; }
+  .mobile-home-intro { padding: 8px 2px 2px; }
+  .mobile-home-intro h1 { margin: 2px 0; color: var(--ink); font-size: 25px; line-height: 1.2; font-weight: 900; }
+  .mobile-home-intro p:last-child { margin: 0; color: var(--subtle); font-size: 16px; }
+  .mobile-eyebrow, .mobile-card-label { margin: 0; color: var(--primary); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .mobile-employer-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; background: #fff; border: 1px solid var(--border); border-radius: 14px; }
+  .mobile-employer-card strong { display: block; margin-top: 4px; color: var(--ink); font-size: 16px; }
+  .mobile-connected { display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .kp-dashboard footer { display: none; }
+}

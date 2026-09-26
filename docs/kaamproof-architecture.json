@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "KaamProof Application Architecture",
+    "output": "kaamproof-architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "request-path", "label": "Request path", "focus": ["user", "app", "api", "db"], "note": "Follow a user action from the browser through the Next.js app and API to PostgreSQL." },
+      { "id": "identity", "label": "Identity and access", "focus": ["user", "app", "auth", "api"], "note": "OTP verification creates an HttpOnly session and every API mutation is server-authorized." },
+      { "id": "proof", "label": "Proof lifecycle", "focus": ["api", "db", "verify"], "note": "Work records, payments, disputes and certificates remain linked and publicly verifiable without PII." }
+    ]
+  },
+  "components": [
+    { "id": "user", "type": "external", "label": "Worker / Employer", "sublabel": "Browser", "pos": [40, 300], "size": [150, 64] },
+    { "id": "app", "type": "frontend", "label": "Next.js App", "sublabel": "Landing + portal", "pos": [280, 300], "size": [160, 64] },
+    { "id": "auth", "type": "security", "label": "OTP Auth", "sublabel": "HttpOnly session", "pos": [280, 120], "size": [160, 64] },
+    { "id": "api", "type": "backend", "label": "API Routes", "sublabel": "Scoped mutations", "pos": [520, 300], "size": [160, 64] },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Drizzle ORM", "pos": [760, 300], "size": [160, 64] },
+    { "id": "verify", "type": "external", "label": "Public Verify", "sublabel": "QR certificate page", "pos": [760, 120], "size": [160, 64] }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "Server-authorized application boundary", "wraps": ["app", "auth", "api", "db"] }
+  ],
+  "connections": [
+    { "id": "user-app", "from": "user", "to": "app", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "app-auth", "from": "app", "to": "auth", "label": "request / verify OTP", "variant": "security", "fromSide": "top", "toSide": "bottom" },
+    { "id": "app-api", "from": "app", "to": "api", "label": "same-origin API" },
+    { "id": "auth-api", "from": "auth", "to": "api", "label": "session cookie", "variant": "security", "fromSide": "right", "toSide": "top" },
+    { "id": "api-db", "from": "api", "to": "db", "label": "SQL / audit trail", "labelDy": 56 },
+    { "id": "verify-db", "from": "verify", "to": "db", "label": "safe certificate lookup", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "labelDy": 24 }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Product surface", "items": ["Responsive public landing page", "Worker and employer portal", "QR-based public certificate verification"] },
+    { "dot": "emerald", "title": "Core records", "items": ["Relationships and wage agreements", "Server-timestamped work sessions", "Payments, disputes and certificates"] },
+    { "dot": "rose", "title": "Trust boundary", "items": ["OTP login with HttpOnly sessions", "Server-side role and ownership checks", "Public verification excludes private data"] }
+  ]
+}

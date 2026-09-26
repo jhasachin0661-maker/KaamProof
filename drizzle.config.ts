@@ -8,4 +8,8 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./drizzle",
   dbCredentials: { url: process.env.DATABASE_URL },
+  // Ensures column names in generated SQL use snake_case to match the schema
+  casing: "snake_case",
+  verbose: true,
+  strict: false,
 });

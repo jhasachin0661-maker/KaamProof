@@ -5,9 +5,9 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    email: text("email").notNull().unique(), // stored lowercase
-    passwordHash: text("password_hash").notNull(), // bcrypt; never returned by any API
-    phone: text("phone").unique(), // optional contact number
+    email: text("email").unique(), // stored lowercase, now optional
+    passwordHash: text("password_hash"), // bcrypt; optional
+    phone: text("phone").notNull().unique(), // Primary authentication identifier
     name: text("name").notNull(),
     role: text("role").notNull().default("worker"), // 'worker' | 'employer' ONLY (enforced by CHECK)
     isActive: boolean("is_active").default(true).notNull(),
@@ -282,17 +282,3 @@ export const verificationRecords = pgTable("verification_records", {
   userAgent: text("user_agent"),
   verifiedAt: timestamp("verified_at", { withTimezone: true }).defaultNow().notNull(),
 });
-
-// One-time password-reset tokens (only the SHA-256 of the emailed token is stored)
-export const passwordResets = pgTable(
-  "password_resets",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-    tokenHash: text("token_hash").notNull().unique(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    usedAt: timestamp("used_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  },
-  (t) => [index("idx_pwreset_user").on(t.userId)]
-);

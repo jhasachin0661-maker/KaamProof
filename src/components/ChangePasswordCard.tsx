@@ -33,21 +33,30 @@ export function ChangePasswordCard() {
     }
   };
 
-  const input = "w-full px-3.5 py-3 rounded-xl bg-stone-950 border border-stone-800 text-white focus:outline-none focus:border-emerald-500 text-sm";
+  const input = "w-full rounded-lg border border-sky-100 bg-white px-3.5 py-3 text-sm font-semibold text-slate-950 shadow-sm focus:border-sky-700 focus:outline-none";
+
   return (
-    <form onSubmit={submit} className="mt-3 space-y-3 max-w-sm">
+    <form onSubmit={submit} className="mt-3 max-w-sm space-y-3">
       <div>
-        <label htmlFor="cp-cur" className="text-xs text-stone-400 block mb-1">मौजूदा पासवर्ड</label>
+        <label htmlFor="cp-cur" className="mb-1 block text-xs font-bold text-slate-600">
+          मौजूदा पासवर्ड
+        </label>
         <input id="cp-cur" type="password" autoComplete="current-password" required value={current} onChange={(e) => setCurrent(e.target.value)} className={input} />
       </div>
       <div>
-        <label htmlFor="cp-new" className="text-xs text-stone-400 block mb-1">नया पासवर्ड (10+ अक्षर, अक्षर + अंक)</label>
+        <label htmlFor="cp-new" className="mb-1 block text-xs font-bold text-slate-600">
+          नया पासवर्ड (10+ अक्षर, अक्षर + अंक)
+        </label>
         <input id="cp-new" type="password" autoComplete="new-password" required minLength={10} value={next} onChange={(e) => setNext(e.target.value)} className={input} />
       </div>
-      <button type="submit" disabled={busy} className="min-h-11 px-5 rounded-xl bg-emerald-600 text-stone-950 font-bold text-xs cursor-pointer disabled:opacity-50">
+      <button type="submit" disabled={busy} className="min-h-11 rounded-lg bg-sky-700 px-5 text-xs font-bold text-white hover:bg-sky-800 disabled:opacity-50">
         {busy ? "..." : "पासवर्ड बदलें"}
       </button>
-      {msg && <p role="status" className={`text-xs ${msg.ok ? "text-emerald-400" : "text-red-400"}`}>{msg.text}</p>}
+      {msg && (
+        <p role="status" className={`text-xs font-semibold ${msg.ok ? "text-sky-700" : "text-red-600"}`}>
+          {msg.text}
+        </p>
+      )}
     </form>
   );
 }

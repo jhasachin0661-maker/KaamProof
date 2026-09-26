@@ -1,59 +1,38 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users, workerProfiles, employerProfiles, userConsents } from "@/db/schema";
-import { createSession, hashPassword, publicUser, setSessionCookie, validatePassword } from "@/lib/auth";
-import { ApiError, Errors, errorResponse, isUniqueViolation } from "@/lib/errors";
-import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { logAuditEvent } from "@/lib/audit";
-import { normalizeEmail, readJson, str } from "@/lib/validate";
+import { users, workerProfiles, employerProfiles } from "@/db/schema";
+import { createSession, hashPassword, publicUser, setSessionCookie } from "@/lib/auth";
+import { ApiError, errorResponse } from "@/lib/errors";
+import { normalizePhone, readJson, str } from "@/lib/validate";
+
+function validatePassword(password: string) {
+  if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+    throw new ApiError(400, "WEAK_PASSWORD", "Password must be at least 8 characters and include a letter and a number.");
+  }
+}
 
 export async function POST(request: Request) {
   try {
-    await rateLimit(`register:${clientIp(request)}`, 10, 60 * 60 * 1000);
     const body = await readJson(request);
-
-    // Only worker/employer can self-register. Anything else (admin, ngo_coordinator, ...) is rejected outright.
-    const role = body.role ?? "worker";
-    if (role !== "worker" && role !== "employer") {
-      throw new ApiError(400, "ROLE_NOT_ALLOWED", "Only worker or employer accounts can be created.", "केवल श्रमिक या नियोक्ता खाता बनाया जा सकता है।");
-    }
+    const phone = normalizePhone(str(body, "phone", { required: true })!);
+    const password = str(body, "password", { min: 8, max: 128 })!;
+    const confirmPassword = str(body, "confirmPassword", { min: 8, max: 128 })!;
     const name = str(body, "name", { min: 2, max: 80 })!;
-    const email = normalizeEmail(str(body, "email", { max: 254 })!);
-    const password = validatePassword(body.password);
-    const phone = str(body, "phone", { min: 7, max: 20, required: false }) ?? null;
-    const city = str(body, "locationCity", { max: 80, required: false }) ?? "Not specified";
-    const detail = str(body, "occupationOrCompany", { max: 120, required: false });
-
-    const passwordHash = await hashPassword(password);
-
-    let user;
-    try {
-      user = await db.transaction(async (tx) => {
-        const [u] = await tx.insert(users).values({ email, passwordHash, phone, name, role }).returning();
-        if (role === "worker") {
-          await tx.insert(workerProfiles).values({ userId: u.id, occupation: detail || "Worker", primaryLocation: city, preferredLang: "hi" });
-          await tx.insert(userConsents).values([
-            { userId: u.id, consentType: "location_capture", version: "v1.0", isAccepted: true },
-            { userId: u.id, consentType: "data_processing", version: "v1.0", isAccepted: true },
-            { userId: u.id, consentType: "certificate_public_verification", version: "v1.0", isAccepted: true },
-          ]);
-        } else {
-          await tx.insert(employerProfiles).values({ userId: u.id, companyOrHouseholdName: detail || `${name} (Household)`, category: "Household / Business", addressCity: city, contactPerson: name });
-        }
-        return u;
-      });
-    } catch (e) {
-      if (isUniqueViolation(e)) throw Errors.conflict("EMAIL_TAKEN", "This email or phone is already registered. Please log in.", "यह ईमेल या फ़ोन पहले से पंजीकृत है। कृपया लॉगिन करें।");
-      throw e;
-    }
-
-    const { token, expiresAt } = await createSession(user.id, request);
-    const res = NextResponse.json({ success: true, user: publicUser({ userId: user.id, email, phone, name, role }) }, { status: 201 });
-    setSessionCookie(res, token, expiresAt);
-    await logAuditEvent({ actorId: user.id, actorRole: role, action: "USER_REGISTERED", entityType: "user", entityId: user.id, details: `New ${role} account registered`, request });
-    return res;
-  } catch (e) {
-    return errorResponse(e, "register");
+    const role = str(body, "role", { required: true });
+    if (role !== "worker" && role !== "employer") throw new ApiError(400, "ROLE_INVALID", "Role must be worker or employer.");
+    if (password !== confirmPassword) throw new ApiError(400, "PASSWORD_MISMATCH", "Passwords do not match.");
+    validatePassword(password);
+    const [existing] = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+    if (existing) throw new ApiError(409, "ACCOUNT_EXISTS", "An account already exists for this mobile number. Please log in.");
+    const [user] = await db.insert(users).values({ phone, name, role, passwordHash: await hashPassword(password) }).returning();
+    if (role === "worker") await db.insert(workerProfiles).values({ userId: user.id, occupation: "Worker", primaryLocation: "Not provided" });
+    else await db.insert(employerProfiles).values({ userId: user.id, companyOrHouseholdName: name, category: "Household", addressCity: "Not provided" });
+    const session = await createSession(user.id, request);
+    const response = NextResponse.json({ user: publicUser({ userId: user.id, email: user.email, phone: user.phone, name: user.name, role: role as "worker" | "employer" }) });
+    setSessionCookie(response, session.token, session.expiresAt);
+    return response;
+  } catch (error) {
+    return errorResponse(error, "auth/register");
   }
 }

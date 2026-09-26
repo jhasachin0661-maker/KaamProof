@@ -90,3 +90,11 @@ export function normalizeEmail(raw: string): string {
   if (e.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) throw Errors.invalid("Enter a valid email address.", "कृपया सही ईमेल दर्ज करें।");
   return e;
 }
+
+export function normalizePhone(raw: string): string {
+  let p = raw.replace(/\D/g, "");
+  // Assume Indian mobile number if 10 digits
+  if (p.length === 10) p = "91" + p;
+  if (!p.startsWith("91") || p.length !== 12) throw Errors.invalid("Enter a valid 10-digit mobile number.", "कृपया सही 10-अंकीय मोबाइल नंबर दर्ज करें।");
+  return "+" + p;
+}

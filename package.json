@@ -9,6 +9,7 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "npm run db:seed:demo",
     "db:seed:demo": "tsx scripts/seed-demo.ts",
     "test:e2e": "node tests/api.e2e.mjs"
   },

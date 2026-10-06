@@ -7,3 +7,15 @@
 5. Browser and accessibility QA — pending running app/browser; required viewport, Hindi/English, offline/PWA and accessibility checks.
 6. Production readiness — pending external configuration; rate limiting, monitoring, backup/restore and deployment evidence.
 7. Documentation and final gate — pending preceding evidence; create docs/FINAL_LAUNCH_READINESS.md and report only evidence-backed statuses.
+# KaamProof production hardening plan
+
+## Current slice: repository-safe launch preparation
+
+- [in_progress] Environment contract and production fail-safe validation
+- [pending] Authentication/password/rate-limit security audit and tests
+- [pending] Worker/employer/API authorization and IDOR verification
+- [pending] Certificate/QR/export privacy verification
+- [pending] Legal, monitoring, backup, and deployment documentation
+- [pending] Browser/mobile/accessibility QA and final release gate
+
+Assumptions: production Supabase project, domain, Redis, backups, and Vercel production variables are not available for autonomous verification. No production migration or deployment will be triggered.

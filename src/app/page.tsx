@@ -1,226 +1,57 @@
-import {
-  BadgeCheck,
-  BriefcaseBusiness,
-  Clock3,
-  FileCheck2,
-  LockKeyhole,
-  QrCode,
-  ShieldCheck,
-  UsersRound,
-} from "lucide-react";
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, Check, Clock3, FileCheck2, LockKeyhole, QrCode, ShieldCheck, UsersRound } from "lucide-react";
 import Link from "next/link";
 
 const steps = [
-  ["Connect", "Worker and employer confirm the work relationship before records start."],
-  ["Agree", "Wage terms are accepted by both sides and versioned over time."],
-  ["Record", "Start and end work sessions with server timestamps and optional GPS evidence."],
-  ["Confirm", "Payments, disputes and approvals stay attached to the same relationship."],
-  ["Verify", "Monthly certificates can be checked publicly through a privacy-safe QR page."],
+  ["01", "Start work", "Open a shared record before the day begins."],
+  ["02", "Record work", "Keep sessions, hours and evidence together."],
+  ["03", "Confirm payment", "Both sides see the same wage trail."],
+  ["04", "Build history", "Carry your verified work passport forward."],
 ];
 
-const proofCards: Array<{
-  title: string;
-  text: string;
-  Icon: React.ComponentType<{ className?: string }>;
-}> = [
-  { title: "Work history", text: "Portable timeline across employers", Icon: BriefcaseBusiness },
-  { title: "Hours worked", text: "Confirmed sessions, pending items separated", Icon: Clock3 },
-  { title: "Wages", text: "Mutual agreement trail with versions", Icon: FileCheck2 },
-  { title: "Certificates", text: "Public verification without private data", Icon: QrCode },
-];
-
-const trustItems = [
-  "HttpOnly sessions and bcrypt password hashing",
-  "Server-side authorization for every action",
-  "Append-only audit trail for sensitive records",
-  "QR verification hides phone, email, location and notes",
+const proofCards = [
+  { title: "Work history", text: "A portable timeline that does not disappear when a job ends.", Icon: BriefcaseBusiness },
+  { title: "Hours & wages", text: "Server-timestamped sessions with pending items kept visible.", Icon: Clock3 },
+  { title: "Certificates", text: "A privacy-safe record people can verify without seeing private data.", Icon: QrCode },
 ];
 
 function Brand() {
-  return (
-    <Link href="/" className="flex items-center gap-3" aria-label="KaamProof home">
-      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-kp-primary text-base font-black text-white shadow-sm">
-        KP
-      </span>
-      <span className="text-lg font-black tracking-tight text-kp-ink">KaamProof</span>
-    </Link>
-  );
-}
-
-function Section({
-  id,
-  eyebrow,
-  title,
-  children,
-  className = "",
-}: {
-  id?: string;
-  eyebrow: string;
-  title: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section id={id} className={`border-t border-sky-100 ${className}`}>
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:py-16">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-kp-primary">{eyebrow}</p>
-        <h2 className="mt-2 max-w-3xl text-2xl font-black tracking-tight text-kp-ink sm:text-3xl">{title}</h2>
-        <div className="mt-8">{children}</div>
-      </div>
-    </section>
-  );
+  return <Link href="/" className="kp-brand" aria-label="KaamProof home"><span className="kp-brand-mark">KP</span><span>KaamProof</span></Link>;
 }
 
 export default function Landing() {
   return (
-    <main className="min-h-screen bg-white text-kp-ink">
-      <header className="bg-kp-bg">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4" aria-label="Main">
-          <Brand />
-          <Link
-            href="/app"
-            className="inline-flex min-h-11 items-center rounded-lg border border-kp-border bg-white px-4 text-sm font-bold text-kp-primary-strong shadow-sm hover:border-kp-primary hover:text-kp-primary"
-          >
-            Log in
-          </Link>
-        </nav>
+    <main className="kp-landing">
+      <header className="kp-landing-header">
+        <nav className="kp-nav" aria-label="Main navigation"><Brand /><div className="kp-nav-links"><a href="#how">How it works</a><a href="#trust">Why KaamProof</a><Link className="kp-nav-login" href="/app">Log in <ArrowRight size={15} /></Link></div></nav>
 
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 pb-14 pt-10 lg:grid-cols-[1.08fr_0.92fr] lg:items-end lg:pb-16 lg:pt-16">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-kp-border bg-white px-3 py-1 text-xs font-bold text-kp-primary-strong shadow-sm">
-              <ShieldCheck className="h-4 w-4 text-kp-primary" />
-              Work records both sides can verify
-            </div>
-            <h1 className="mt-5 max-w-4xl text-4xl font-black leading-[1.03] tracking-tight text-kp-ink sm:text-6xl">
-              Work is real. Now it has a record.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-kp-subtle sm:text-lg">
-              KaamProof helps workers and employers maintain a privacy-safe trail of work sessions,
-              wage agreements, payments and verified certificates.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/app"
-                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-kp-primary px-6 text-sm font-black text-white shadow-sm hover:bg-kp-primary-strong"
-              >
-                Get started
-                <BadgeCheck className="h-4 w-4" />
-              </Link>
-              <a
-                href="#how"
-                className="inline-flex min-h-12 items-center rounded-lg border border-kp-border bg-white px-6 text-sm font-bold text-kp-primary-strong shadow-sm hover:border-kp-primary"
-              >
-                See how it works
-              </a>
-            </div>
+        <div className="kp-hero">
+          <div className="kp-hero-copy">
+            <p className="kp-kicker"><ShieldCheck size={16} /> Worker-owned proof of work</p>
+            <h1>Work is real.<br /><em>Now it&apos;s proven.</em></h1>
+            <p className="kp-hero-lede">A calm, shared record of work, wages, payments and verified history — built for the people whose work is often left undocumented.</p>
+            <div className="kp-hero-actions"><Link href="/app" className="kp-button kp-button-primary">Get started <ArrowRight size={18} /></Link><a href="#how" className="kp-button kp-button-secondary">See how it works</a></div>
+            <div className="kp-evidence-line"><span><Check size={14} /> Mutual confirmation</span><span><Check size={14} /> Audit history</span><span><Check size={14} /> QR verification</span></div>
           </div>
-
-          <div className="rounded-lg border border-kp-border bg-white p-4 shadow-xl shadow-sky-950/10">
-            <div className="flex items-center justify-between border-b border-sky-100 pb-3">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-kp-primary">Work passport</p>
-                <p className="text-sm font-semibold text-kp-subtle">Public-safe verification summary</p>
-              </div>
-              <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-kp-primary-strong">Verified</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3 py-4">
-              {[
-                ["28", "confirmed days"],
-                ["224h", "verified hours"],
-                ["₹450", "daily wage"],
-                ["0", "open disputes"],
-              ].map(([value, label]) => (
-                <div key={label} className="rounded-lg border border-sky-100 bg-sky-50/70 p-4">
-                  <div className="text-2xl font-black text-kp-primary-strong">{value}</div>
-                  <div className="mt-1 text-xs font-semibold text-kp-subtle">{label}</div>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-lg border border-dashed border-kp-border bg-white p-4">
-              <div className="flex items-start gap-3">
-                <QrCode className="mt-1 h-9 w-9 text-kp-primary" />
-                <div>
-                  <p className="font-bold text-kp-ink">QR certificate check</p>
-                  <p className="mt-1 text-sm leading-6 text-kp-subtle">
-                    Anyone can verify status without seeing phone numbers, private notes or raw GPS.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="kp-hero-visual">
+            <div className="kp-photo kp-photo-hero"><img src="/images/hero-walk-home.png" alt="Worker arriving home after a day of work" /></div>
+            <div className="kp-passport-float"><div className="kp-float-top"><span>WORK PASSPORT</span><BadgeCheck size={18} /></div><strong>Verified work history</strong><div className="kp-mini-stats"><span><b>28</b> sessions</span><span><b>224h</b> recorded</span></div><div className="kp-progress"><i /><i /><i /><i /><i /></div></div>
+            <span className="kp-hero-note">A record that travels with you</span>
           </div>
         </div>
       </header>
 
-      <Section eyebrow="Problem" title="Informal work records should not disappear when a job ends.">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {proofCards.map(({ title, text, Icon }) => (
-            <article key={title} className="rounded-lg border border-sky-100 bg-white p-5 shadow-sm">
-              <Icon className="h-5 w-5 text-kp-primary" />
-              <h3 className="mt-4 font-black text-kp-ink">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-kp-subtle">{text}</p>
-            </article>
-          ))}
-        </div>
-      </Section>
+      <section className="kp-section kp-problem"><div className="kp-section-heading"><p className="kp-kicker">The problem</p><h2>Your work should not disappear when the job ends.</h2></div><div className="kp-proof-grid">{proofCards.map(({ title, text, Icon }) => <article className="kp-proof-card" key={title}><Icon size={22} /><h3>{title}</h3><p>{text}</p></article>)}</div></section>
 
-      <Section id="how" eyebrow="Workflow" title="A shared record from relationship request to certificate.">
-        <ol className="grid gap-3 md:grid-cols-5">
-          {steps.map(([title, text], index) => (
-            <li key={title} className="rounded-lg border border-sky-100 bg-sky-50/70 p-4">
-              <div className="text-xs font-black uppercase tracking-[0.16em] text-kp-primary">Step {index + 1}</div>
-              <div className="mt-3 font-black text-kp-ink">{title}</div>
-              <p className="mt-2 text-sm leading-6 text-kp-subtle">{text}</p>
-            </li>
-          ))}
-        </ol>
-      </Section>
+      <section className="kp-story-section"><div className="kp-story-image kp-photo"><img src="/images/shared-pages.png" alt="Two people reviewing shared work records at a table" loading="lazy" /></div><div className="kp-story-copy"><p className="kp-kicker">Trust, made visible</p><h2>One shared record.<br />Fewer difficult conversations.</h2><p>KaamProof gives workers and employers the same source of truth: what was agreed, what happened, what was paid and what still needs attention.</p><div className="kp-check-list"><span><Check size={16} /> Clear before the work starts</span><span><Check size={16} /> Neutral when there is a dispute</span><span><Check size={16} /> Private by default</span></div><Link href="/app" className="kp-text-link">Open your work record <ArrowRight size={16} /></Link></div></section>
 
-      <Section eyebrow="Roles" title="Built for workers and employers without changing ownership of the record.">
-        <div className="grid gap-5 md:grid-cols-2">
-          <article className="rounded-lg border border-sky-100 bg-white p-6 shadow-sm">
-            <UsersRound className="h-6 w-6 text-kp-primary" />
-            <h3 className="mt-4 text-xl font-black">For workers</h3>
-            <p className="mt-3 leading-7 text-kp-subtle">
-              Track sessions, agreements, payments, disputes and certificates in one portable work passport.
-            </p>
-          </article>
-          <article className="rounded-lg border border-sky-100 bg-white p-6 shadow-sm">
-            <BriefcaseBusiness className="h-6 w-6 text-kp-primary" />
-            <h3 className="mt-4 text-xl font-black">For employers</h3>
-            <p className="mt-3 leading-7 text-kp-subtle">
-              Confirm relationships, review signals, settle payments and resolve disputes through scoped access.
-            </p>
-          </article>
-        </div>
-      </Section>
+      <section id="how" className="kp-section kp-how"><div className="kp-section-heading"><p className="kp-kicker">How it works</p><h2>From today&apos;s work<br />to tomorrow&apos;s proof.</h2></div><ol className="kp-step-grid">{steps.map(([number, title, text]) => <li key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></li>)}</ol></section>
 
-      <Section eyebrow="Trust" title="The product is explicit about what it proves and what it does not.">
-        <div className="grid gap-3 md:grid-cols-2">
-          {trustItems.map((item) => (
-            <div key={item} className="flex items-start gap-3 rounded-lg border border-sky-100 bg-sky-50/70 p-4">
-              <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-kp-primary" />
-              <p className="text-sm font-semibold leading-6 text-kp-primary-strong">{item}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
+      <section className="kp-passport-showcase"><div className="kp-passport-image kp-photo"><img src="/images/work-passport.png" alt="Work Passport document showing verified work records" loading="lazy" /></div><div><p className="kp-kicker">The signature record</p><h2>Your work passport belongs to you.</h2><p>Sessions, employers, payments and certificates come together in a history you can carry, understand and share intentionally.</p><div className="kp-passport-pills"><span>Verified sessions</span><span>Employer history</span><span>Payment record</span></div><Link href="/app" className="kp-button kp-button-light">Create your passport <ArrowRight size={18} /></Link></div></section>
 
-      <section className="bg-kp-primary-strong text-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-12 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight">Your work history stays with you.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-sky-100">
-              KaamProof is a digital work record, not a court, government employment proof or payment service.
-            </p>
-          </div>
-          <Link
-            href="/app"
-            className="inline-flex min-h-12 items-center justify-center rounded-lg bg-white px-6 text-sm font-black text-kp-primary-strong hover:bg-sky-50"
-          >
-            Open KaamProof
-          </Link>
-        </div>
-      </section>
+      <section id="trust" className="kp-section kp-trust"><div className="kp-section-heading"><p className="kp-kicker">Built for trust</p><h2>Useful proof, without pretending to be something it is not.</h2></div><div className="kp-trust-grid"><div className="kp-trust-list"><p><LockKeyhole size={20} /> Server timestamps for important actions</p><p><UsersRound size={20} /> Mutual confirmation keeps both sides involved</p><p><FileCheck2 size={20} /> Append-only audit trail for sensitive records</p><p><QrCode size={20} /> Public verification hides private details</p></div><div className="kp-certificate-card"><img src="/images/certificate-desk.png" alt="Work certificate on a desk" loading="lazy" /><div><b>Certificate #KP-2026-XXXX</b><span><BadgeCheck size={15} /> Verified work history</span></div></div></div></section>
+
+      <section className="kp-final-cta"><p className="kp-kicker">Keep what you build</p><h2>Make your work<br /><em>impossible to lose.</em></h2><Link href="/app" className="kp-button kp-button-light">Open KaamProof <ArrowRight size={18} /></Link><small>KaamProof is a digital work record — not a court, government employment proof or payment service.</small></section>
+      <footer className="kp-footer"><Brand /><span>Work is real. Now it has a record.</span></footer>
     </main>
   );
 }

@@ -15,6 +15,9 @@
     "test:idor": "node tests/auth-phone-idor.mjs"
   },
   "dependencies": {
+    "@supabase/server": "^1.9.1",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
     "@types/canvas-confetti": "^1.9.0",
     "@types/qrcode": "^1.5.6",
     "bcryptjs": "^3.0.3",

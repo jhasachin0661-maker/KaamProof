@@ -1380,9 +1380,9 @@ export default function KaamProofApp() {
                 {relationships.length === 0 && (
                   <div className="bg-amber-950/40 border border-amber-500/50 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="space-y-1">
-                    <div className="kp-profile-card-heading"><div className="kp-profile-avatar">{user.name.slice(0, 1).toUpperCase()}</div><div><p className="kp-profile-eyebrow">WORK PASSPORT · PROFILE</p><h3 className="text-base font-bold text-white">
+                    <h3 className="text-base font-bold text-white">
                         नया खाता तैयार है! काम शुरू करने के लिए अपने नियोक्ता (Employer) को जोड़ें
-                    </h3></div><span className="kp-profile-verified"><BadgeCheck className="h-4 w-4" /> Verified</span></div>
+                    </h3>
                       <p className="text-xs text-stone-300">
                         अपने नियोक्ता का नाम या मोबाइल नंबर दर्ज करके पारस्परिक मजदूरी समझौता (Wage Agreement v1) सक्रिय करें।
                       </p>
@@ -1851,7 +1851,7 @@ export default function KaamProofApp() {
                 {/* WORKER TAB 6: PROFILE */}
                 {activeTab === "profile" && (
                   <div className="kp-profile-card bg-stone-900 p-6 rounded-2xl border border-stone-800 max-w-xl space-y-3 text-sm">
-                    <h3 className="text-base font-bold text-white">मेरी सत्यापित प्रोफाइल</h3>
+                    <div className="kp-profile-card-heading"><div className="kp-profile-avatar">{user.name.slice(0, 1).toUpperCase()}</div><div><p className="kp-profile-eyebrow">WORK PASSPORT · PROFILE</p><h3 className="text-base font-bold text-white">मेरी सत्यापित प्रोफाइल</h3></div><span className="kp-profile-verified"><BadgeCheck className="h-4 w-4" /> Verified</span></div>
                     <div>
                       <span className="text-xs text-stone-400 block">नाम:</span>
                       <span className="font-bold text-white">{user.name}</span>

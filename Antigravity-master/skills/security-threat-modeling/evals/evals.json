@@ -1,0 +1,27 @@
+{
+  "skill_name": "security-threat-modeling",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Conduct a STRIDE threat model for a multi-tenant SaaS REST API with a PostgreSQL database and JWT authentication.",
+      "expected_output": "The agent constructs a DFD with trust boundaries and produces a STRIDE matrix with mitigations for each threat category.",
+      "files": [],
+      "expectations": [
+        "DFD constructed with external entities, processes, data stores, and trust boundaries",
+        "All 6 STRIDE categories addressed with corresponding technical mitigations",
+        "Privacy compliance notes carry explicit NOT LEGAL ADVICE disclaimer"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Analyze the attack surface of a public-facing API gateway and identify high-priority threat vectors.",
+      "expected_output": "The agent enumerates attack surface entry points, assesses information disclosure and DoS risks, and proposes security controls.",
+      "files": [],
+      "expectations": [
+        "Attack surface entry points explicitly enumerated",
+        "Threat severity prioritized by impact",
+        "Architectural mitigations specified per threat"
+      ]
+    }
+  ]
+}

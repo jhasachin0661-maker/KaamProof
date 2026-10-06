@@ -1,0 +1,27 @@
+{
+  "skill_name": "perf-engineering",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Optimize a slow SQL query causing high latency on the order history API endpoint, measuring baseline and post-index performance.",
+      "expected_output": "The agent records baseline latency using EXPLAIN ANALYZE, adds a composite database index, and measures post-optimization performance to prove empirical latency improvement.",
+      "files": [],
+      "expectations": [
+        "Baseline performance metric recorded before any schema/code edit",
+        "EXPLAIN ANALYZE query plan evaluated to identify Sequential Scans",
+        "Post-optimization benchmark metrics recorded showing empirical improvement"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run a k6 load test against a web API and optimize bundle size and caching headers for frontend assets.",
+      "expected_output": "The agent executes k6 load test script, analyzes Web Vitals and bundle size, applies code splitting, and verifies latency reduction.",
+      "files": [],
+      "expectations": [
+        "Load test executed with k6 measuring P95/P99 latency thresholds",
+        "Frontend bundle size optimization and Cache-Control headers applied",
+        "Comparative metrics provided demonstrating before-and-after improvement"
+      ]
+    }
+  ]
+}

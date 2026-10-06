@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     if (role === "worker") await db.insert(workerProfiles).values({ userId: user.id, occupation: "Worker", primaryLocation: "Not provided" });
     else await db.insert(employerProfiles).values({ userId: user.id, companyOrHouseholdName: name, category: "Household", addressCity: "Not provided" });
     const session = await createSession(user.id, request);
-    const response = NextResponse.json({ user: publicUser({ userId: user.id, email: user.email, phone: user.phone, name: user.name, role: role as "worker" | "employer" }) });
+    const response = NextResponse.json({ user: publicUser({ userId: user.id, phone: user.phone, name: user.name, role: role as "worker" | "employer" }) });
     setSessionCookie(response, session.token, session.expiresAt);
     return response;
   } catch (error) {

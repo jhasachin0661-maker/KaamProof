@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "npm run db:seed:demo",
     "db:seed:demo": "tsx scripts/seed-demo.ts",
-    "test:e2e": "node tests/api.e2e.mjs"
+    "test:e2e": "node tests/api.e2e.mjs",
+    "test:idor": "node tests/auth-phone-idor.mjs"
   },
   "dependencies": {
     "@types/canvas-confetti": "^1.9.0",

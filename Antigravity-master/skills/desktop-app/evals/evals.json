@@ -1,0 +1,27 @@
+{
+  "skill_name": "desktop-app",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a minimal Electron app with a system tray icon that shows a context menu with Quit option.",
+      "expected_output": "The agent scaffolds the Electron project, implements Tray with a context menu, and the app runs without errors.",
+      "files": [],
+      "expectations": [
+        "Electron main process creates a Tray instance",
+        "Context menu includes a Quit option that calls app.quit()",
+        "npm start exits 0 or launches successfully"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Set up electron-builder packaging for Windows with NSIS installer and auto-update via electron-updater.",
+      "expected_output": "The agent configures electron-builder with NSIS target and integrates autoUpdater with update checking on app ready.",
+      "files": [],
+      "expectations": [
+        "electron-builder config targets NSIS for Windows",
+        "autoUpdater.checkForUpdatesAndNotify called on app ready",
+        "Code signing and publish config flagged as CRITICAL requiring approval"
+      ]
+    }
+  ]
+}

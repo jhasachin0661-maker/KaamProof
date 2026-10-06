@@ -3,7 +3,6 @@ export interface UserData {
   id: string;
   name: string;
   phone: string;
-  email?: string | null;
   role: "worker" | "employer";
   profileCompleted?: boolean;
 }

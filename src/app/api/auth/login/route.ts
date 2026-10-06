@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     const [user] = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
     if (!user || user.role !== role || !(await verifyPassword(password, user.passwordHash))) throw Errors.invalidCredentials();
     const session = await createSession(user.id, request);
-    const response = NextResponse.json({ user: publicUser({ userId: user.id, email: user.email, phone: user.phone, name: user.name, role: user.role as "worker" | "employer" }) });
+    const response = NextResponse.json({ user: publicUser({ userId: user.id, phone: user.phone, name: user.name, role: user.role as "worker" | "employer" }) });
     setSessionCookie(response, session.token, session.expiresAt);
     return response;
   } catch (error) {

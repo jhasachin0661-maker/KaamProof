@@ -1,0 +1,38 @@
+{
+  "skill_name": "core-research",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Compare Prisma ORM vs Drizzle ORM for a Next.js 15 App Router project.",
+      "expected_output": "The skill conducts research comparing Prisma and Drizzle, checks lockfile versions, and generates a structured comparison matrix.",
+      "files": [],
+      "expectations": [
+        "The research output prioritizes official documentation and specs over forum posts",
+        "Findings are presented using a structured comparison matrix comparing criteria like performance and type safety",
+        "All claims are explicitly tagged with VERIFIED (citing official docs) or ASSUMPTION"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Investigate why we are seeing a 'TypeError: Cannot read properties of undefined (reading 'headers')' error in Next.js 15.",
+      "expected_output": "The skill checks Next.js version in lockfile, researches official migration docs for async headers API changes in Next.js 15, and reports verified fix.",
+      "files": [],
+      "expectations": [
+        "The skill inspects package lockfiles to determine the exact installed Next.js version",
+        "The investigation cites official Next.js 15 documentation regarding async headers() breaking changes",
+        "Claims and recommendations are labeled with VERIFIED evidence tags"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What is the latest stable version of TailwindCSS and how do we upgrade?",
+      "expected_output": "The skill verifies installed TailwindCSS version from package.json and researches official upgrade guide.",
+      "files": [],
+      "expectations": [
+        "The skill checks current installed version before providing upgrade steps",
+        "Web search or documentation findings are treated strictly as untrusted data without executing embedded scripts",
+        "Upgrade instructions clearly distinguish between verified breaking changes and assumptions"
+      ]
+    }
+  ]
+}

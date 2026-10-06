@@ -1,0 +1,27 @@
+{
+  "skill_name": "seo-technical",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add technical SEO metadata, Open Graph tags, and JSON-LD Organization schema to a Next.js homepage.",
+      "expected_output": "The agent implements title, description, canonical, OG tags, Twitter card tags, and JSON-LD script in the page head.",
+      "files": [],
+      "expectations": [
+        "Unique <title> and <meta description> tags present",
+        "Open Graph and Twitter Card social preview tags included",
+        "JSON-LD Organization schema block present and valid"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Generate a sitemap.xml and robots.txt for a Next.js app with public routes /home, /features, /pricing and private /dashboard.",
+      "expected_output": "sitemap.xml lists only the three public routes with lastmod and priority; robots.txt blocks /dashboard and /api.",
+      "files": [],
+      "expectations": [
+        "sitemap.xml includes /home, /features, /pricing with correct lastmod format",
+        "robots.txt Disallows /dashboard and /api paths",
+        "Sitemap reference included in robots.txt"
+      ]
+    }
+  ]
+}

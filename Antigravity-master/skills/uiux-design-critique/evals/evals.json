@@ -1,0 +1,27 @@
+{
+  "skill_name": "uiux-design-critique",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit the landing page design for low contrast text, improper typography hierarchy, and cramped mobile layout.",
+      "expected_output": "The agent captures viewports, audits visual elements using the checklist, flags contrast and layout bugs, and applies CSS fixes.",
+      "files": [],
+      "expectations": [
+        "Visual QA inspection tests multiple viewport sizes",
+        "Low contrast text and hierarchy flaws are flagged using the visual QA checklist",
+        "Actionable CSS remedies are proposed or applied"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review a dashboard table component to ensure empty, loading, and error states are properly implemented.",
+      "expected_output": "The agent evaluates missing UI states and recommends skeleton loaders and empty state indicators.",
+      "files": [],
+      "expectations": [
+        "Missing UI states (loading, empty, error) are detected",
+        "Anti-patterns in table spacing and visual noise are identified",
+        "Recommendations follow anti-pattern catalog principles"
+      ]
+    }
+  ]
+}

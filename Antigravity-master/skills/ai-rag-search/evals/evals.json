@@ -1,0 +1,27 @@
+{
+  "skill_name": "ai-rag-search",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a RAG pipeline that chunks markdown files, embeds them with OpenAI text-embedding-3-small, stores in pgvector, and retrieves top-5 results for a query.",
+      "expected_output": "The agent implements chunking, embedding, pgvector storage with HNSW index, and a retrieval function returning top-5 results with source metadata.",
+      "files": [],
+      "expectations": [
+        "Recursive or sentence-based chunking implemented with configurable size/overlap",
+        "pgvector table has vector column with HNSW or IVFFlat index",
+        "Retrieval function returns results with source file and chunk metadata"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add hybrid search combining BM25 keyword search with vector similarity, and add a cross-encoder reranker.",
+      "expected_output": "The agent implements BM25 alongside vector search, fuses scores, and applies a cross-encoder reranker to the merged results.",
+      "files": [],
+      "expectations": [
+        "BM25 keyword search implemented alongside vector similarity",
+        "Score fusion combines results from both retrieval methods",
+        "Cross-encoder reranker reorders the fused results"
+      ]
+    }
+  ]
+}

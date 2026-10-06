@@ -33,7 +33,7 @@ export class ApiError extends Error {
 
 export const Errors = {
   authRequired: () => new ApiError(401, "AUTH_REQUIRED", "Please log in to continue.", "कृपया जारी रखने के लिए लॉगिन करें।"),
-  invalidCredentials: () => new ApiError(401, "INVALID_CREDENTIALS", "Incorrect email or password.", "ईमेल या पासवर्ड गलत है।"),
+  invalidCredentials: () => new ApiError(401, "INVALID_CREDENTIALS", "Incorrect phone number or password.", "मोबाइल नंबर या पासवर्ड गलत है।"),
   forbidden: (en = "You are not allowed to do this.", hi = "आपको यह करने की अनुमति नहीं है।") => new ApiError(403, "FORBIDDEN", en, hi),
   notFound: (en = "Record not found.", hi = "रिकॉर्ड नहीं मिला।") => new ApiError(404, "NOT_FOUND", en, hi),
   invalid: (en: string, hi?: string) => new ApiError(400, "VALIDATION_ERROR", en, hi),

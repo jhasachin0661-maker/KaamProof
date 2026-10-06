@@ -1,0 +1,27 @@
+{
+  "skill_name": "core-refactoring",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Refactor a legacy authentication utility module into smaller functions while preserving behavior.",
+      "expected_output": "Characterization tests are written and run first. Code is refactored in small steps with tests executed after each step.",
+      "files": [],
+      "expectations": [
+        "Characterization tests are created and passing before any refactoring edits",
+        "Refactoring is performed in small, reversible steps",
+        "Tests are executed after each step and exit with code 0"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Extract duplicate data parsing logic across three API controllers into a shared utility function.",
+      "expected_output": "Behavior-preserving extraction using characterization tests without introducing functional changes or broken tests.",
+      "files": [],
+      "expectations": [
+        "Duplicate logic is extracted into a shared module without changing external behavior",
+        "Full test suite passes after each extraction step",
+        "No net-new features or behavior changes are introduced during refactoring"
+      ]
+    }
+  ]
+}

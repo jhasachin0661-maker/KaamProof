@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     const isWorker = p.role === "worker";
     const me = p.userId;
 
-    const [user] = await db.select({ id: users.id, name: users.name, email: users.email, phone: users.phone }).from(users).where(eq(users.id, p.userId)).limit(1);
+    const [user] = await db.select({ id: users.id, name: users.name, phone: users.phone }).from(users).where(eq(users.id, p.userId)).limit(1);
     const [profile] = isWorker
       ? await db.select().from(workerProfiles).where(eq(workerProfiles.userId, p.userId)).limit(1)
       : await db.select().from(employerProfiles).where(eq(employerProfiles.userId, p.userId)).limit(1);

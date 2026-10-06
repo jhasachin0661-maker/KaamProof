@@ -1,0 +1,38 @@
+{
+  "skill_name": "database-migrations-orm",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a new Prisma migration adding an email_verified boolean field to the User table for local dev.",
+      "expected_output": "The skill checks Prisma version in package.json, creates forward migration script, and executes local migration as LOW/MEDIUM risk.",
+      "files": [],
+      "expectations": [
+        "Verifies Prisma version from package.json before generating schema change",
+        "Generates migration files with forward and rollback handling",
+        "Executes migration autonomously in local development environment"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Prepare an Alembic database migration to rename a column in production PostgreSQL database.",
+      "expected_output": "The skill applies expand/contract pattern, flags production execution as CRITICAL risk requiring dry-run SQL and explicit approval.",
+      "files": [],
+      "expectations": [
+        "Applies expand/contract pattern to prevent zero-downtime deployment breakage",
+        "Flags production database migration execution as CRITICAL risk",
+        "Generates dry-run migration SQL and requires explicit human authorization"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Fix an N+1 query performance bug in a Drizzle ORM query fetching user posts.",
+      "expected_output": "The skill identifies N+1 query pattern, refactors query using relational eager loading, and verifies query correctness.",
+      "files": [],
+      "expectations": [
+        "Identifies N+1 query bottleneck in existing ORM code",
+        "Refactors Drizzle query using relational include/with joins",
+        "Verifies typecheck and test suite exit code 0"
+      ]
+    }
+  ]
+}

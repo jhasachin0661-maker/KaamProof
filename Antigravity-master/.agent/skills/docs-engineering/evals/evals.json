@@ -1,0 +1,27 @@
+{
+  "skill_name": "docs-engineering",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Update README.md to reflect new environment variables and API endpoints introduced in the latest pull request.",
+      "expected_output": "The agent inspects code diffs, updates README environment tables, API references, and empirically verifies quickstart commands.",
+      "files": [],
+      "expectations": [
+        "README environment variables table is updated matching code diffs",
+        "Documented setup commands are executed and verified (exit code 0)",
+        "Zero broken links or unverified CLI commands remain"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create an Architecture Decision Record (ADR) and a troubleshooting guide for switching from session cookies to JWT auth.",
+      "expected_output": "The agent generates a structured ADR in docs/adr/ and a troubleshooting guide covering token expiration and refresh errors.",
+      "files": [],
+      "expectations": [
+        "ADR file created matching adr-template.md in docs/adr/",
+        "Troubleshooting guide documents root cause and resolution steps",
+        "Code diff behavior strictly matches documentation content"
+      ]
+    }
+  ]
+}

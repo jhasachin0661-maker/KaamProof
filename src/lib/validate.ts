@@ -85,12 +85,6 @@ export function dateTime(b: Body, key: string): Date | undefined {
   return d;
 }
 
-export function normalizeEmail(raw: string): string {
-  const e = raw.trim().toLowerCase();
-  if (e.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) throw Errors.invalid("Enter a valid email address.", "कृपया सही ईमेल दर्ज करें।");
-  return e;
-}
-
 export function normalizePhone(raw: string): string {
   let p = raw.replace(/\D/g, "");
   // Assume Indian mobile number if 10 digits

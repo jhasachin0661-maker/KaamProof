@@ -1,0 +1,13 @@
+{
+  "name": "hello-api",
+  "version": "1.0.0",
+  "description": "Minimal Hello API example for Antigravity skill sequence walkthrough",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

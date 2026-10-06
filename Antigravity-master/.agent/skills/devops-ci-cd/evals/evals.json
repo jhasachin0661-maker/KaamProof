@@ -1,0 +1,27 @@
+{
+  "skill_name": "devops-ci-cd",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a GitHub Actions CI pipeline for a Node.js project with npm caching, matrix testing across Node 18/20/22, and pinned action SHAs.",
+      "expected_output": "The agent generates a GitHub Actions workflow in .github/workflows/ci.yml with top-level permissions, 40-character SHA pinning, Node version matrix, and npm caching.",
+      "files": [],
+      "expectations": [
+        "Workflow uses 40-character commit SHAs for third-party actions",
+        "Top-level permissions: read-all or explicit minimal permissions declared",
+        "Matrix testing strategy and dependency caching configured"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Configure an environment promotion deployment workflow using GitHub OIDC and environment protection gates.",
+      "expected_output": "The agent constructs staging and production deployment jobs with OIDC authentication, environment protection rules, and concurrency limits.",
+      "files": [],
+      "expectations": [
+        "OIDC federated auth (id-token: write) used instead of hardcoded cloud keys",
+        "Environment protection rules configured for staging and production",
+        "Concurrency group set up to prevent simultaneous deployment races"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "skill_name": "core-requirements-planning",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build me a user authentication and profile management system with social login.",
+      "expected_output": "The skill generates a requirements.md with functional/non-functional criteria, Given/When/Then acceptance criteria, flags auth/PII data sensitivity, and creates a task DAG.",
+      "files": [],
+      "expectations": [
+        "The skill creates requirements.md with functional and non-functional requirement sections",
+        "Acceptance criteria are formulated using Given/When/Then syntax",
+        "Data sensitivity for user credentials and PII is explicitly flagged",
+        "Open questions are batched into a single list rather than asked piecemeal"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a roadmap and PRD for adding stripe payment subscriptions to our SaaS app.",
+      "expected_output": "The skill generates a PRD flagging payments data sensitivity as CRITICAL risk and breaks work into vertical slices.",
+      "files": [],
+      "expectations": [
+        "The requirement analysis flags payment processing as CRITICAL data sensitivity",
+        "Tasks are deconstructed into a vertical DAG with explicit dependencies",
+        "No unrequested scope expansion is introduced beyond subscription payments"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Break down the user stories and acceptance criteria for a real-time chat feature.",
+      "expected_output": "The skill breaks down user stories into verifiable Given/When/Then acceptance criteria and task DAGs.",
+      "files": [],
+      "expectations": [
+        "User stories include explicit Given/When/Then acceptance criteria",
+        "Non-functional requirements specify latency and WebSocket connection constraints",
+        "Definition of done includes automated test verification and clean build exit code"
+      ]
+    }
+  ]
+}

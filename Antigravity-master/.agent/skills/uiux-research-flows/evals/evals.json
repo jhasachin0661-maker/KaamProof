@@ -1,0 +1,27 @@
+{
+  "skill_name": "uiux-research-flows",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create user personas, map the user journey, and output ASCII wireframes for a B2B expense reporting app.",
+      "expected_output": "The agent constructs target user personas, maps the step-by-step submission journey, and outputs an ASCII dashboard wireframe.",
+      "files": [],
+      "expectations": [
+        "User persona explicitly defines goals and pain points",
+        "User journey map covers discovery through goal outcome",
+        "Low-fidelity ASCII or HTML wireframe rendered"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Develop Information Architecture (IA) navigation tree and step-by-step user flow for a telehealth patient portal.",
+      "expected_output": "The agent creates a navigation tree and maps appointment booking user flow.",
+      "files": [],
+      "expectations": [
+        "Information Architecture site map constructed",
+        "User flow diagram maps steps from trigger to outcome",
+        "No dead ends or missing transition states in user flow"
+      ]
+    }
+  ]
+}

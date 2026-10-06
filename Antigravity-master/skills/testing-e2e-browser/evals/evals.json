@@ -1,0 +1,38 @@
+{
+  "skill_name": "testing-e2e-browser",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a Playwright E2E browser test verifying the user login flow on localhost.",
+      "expected_output": "The skill auto-detects Playwright, uses getByRole locators, enforces localhost safety, and avoids sleep timers.",
+      "files": [],
+      "expectations": [
+        "Auto-detects Playwright E2E framework from project files",
+        "Uses resilient role locators and auto-waiting assertions without arbitrary sleeps",
+        "Restricts execution strictly to localhost/staging environments"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Author a Cypress test for checkout flow with visual regression snapshots and mobile viewport emulation.",
+      "expected_output": "The skill configures mobile viewport (375x812), captures visual regression snapshots, and mocks network calls.",
+      "files": [],
+      "expectations": [
+        "Auto-detects Cypress testing environment",
+        "Emulates mobile viewport dimensions (375x812) and captures visual regression snapshots",
+        "Ensures zero real payment calls are executed during test run"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Integrate axe-core accessibility auditing into existing Playwright E2E navigation suite.",
+      "expected_output": "The skill installs/configures @axe-core/playwright, runs accessibility scans during navigation, and checks WCAG compliance.",
+      "files": [],
+      "expectations": [
+        "Integrates axe-core in-browser accessibility engine into E2E navigation",
+        "Audits pages for WCAG compliance violations",
+        "Verifies E2E test runner exit code 0"
+      ]
+    }
+  ]
+}

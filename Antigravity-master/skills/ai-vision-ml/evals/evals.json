@@ -1,0 +1,27 @@
+{
+  "skill_name": "ai-vision-ml",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Set up a YOLOv8 object detection pipeline that trains on a custom dataset of 100 labeled images and evaluates mAP on a test split.",
+      "expected_output": "The agent configures YOLOv8, splits data into train/val/test, trains the model, and reports mAP metrics.",
+      "files": [],
+      "expectations": [
+        "Dataset split into train/val/test with no leakage",
+        "YOLOv8 training completes with logged metrics",
+        "mAP reported on the test set with evidence"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Build an OCR pipeline using EasyOCR that extracts text from scanned invoice images and returns structured JSON with vendor, date, and total.",
+      "expected_output": "The agent integrates EasyOCR, processes images, and parses extracted text into structured fields.",
+      "files": [],
+      "expectations": [
+        "EasyOCR reader initialized with appropriate language",
+        "Text extraction runs on test images without errors",
+        "Structured output contains vendor, date, and total fields"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "skill_name": "mobile-app",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Scaffold a new Expo TypeScript app with a bottom tab navigator containing Home, Profile, and Settings screens.",
+      "expected_output": "The agent creates the Expo project, installs React Navigation, and implements a Tab.Navigator with three screens.",
+      "files": [],
+      "expectations": [
+        "npx expo-doctor exits 0",
+        "Tab navigator with Home, Profile, and Settings screens implemented",
+        "No JS errors on simulator launch"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Integrate push notifications into an Expo app and register the device token, handling simulator and permission-denied cases.",
+      "expected_output": "The agent implements the permission request flow, returns null for simulators and denied permissions, and stores the token securely.",
+      "files": [],
+      "expectations": [
+        "Device.isDevice check prevents simulator registration",
+        "Returns null on denied permission instead of throwing",
+        "Token stored via expo-secure-store, not plain AsyncStorage"
+      ]
+    }
+  ]
+}

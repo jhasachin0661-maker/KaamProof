@@ -1,0 +1,27 @@
+{
+  "skill_name": "core-dependency-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit package.json and upgrade outdated minor dependencies while ensuring security vulnerabilities are fixed.",
+      "expected_output": "The agent inspects npm dependencies, audits vulnerabilities, updates packages in small batches, and verifies lockfiles and test execution.",
+      "files": [],
+      "expectations": [
+        "Audit command is executed to detect security vulnerabilities",
+        "Dependencies are updated in small batches with test validation after each batch",
+        "Lockfile is verified and kept in sync with package.json"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Upgrade Python dependencies in pyproject.toml to major versions and check for breaking API changes.",
+      "expected_output": "Major version upgrades are performed one by one after reading changelogs, updating code call sites, and checking license compliance.",
+      "files": [],
+      "expectations": [
+        "Changelogs and breaking changes are evaluated before major version upgrades",
+        "Single package major upgrade is performed per step",
+        "License compliance check is executed"
+      ]
+    }
+  ]
+}

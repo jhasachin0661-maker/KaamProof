@@ -1,0 +1,27 @@
+{
+  "skill_name": "ops-observability",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Configure structured JSON logging for a Node.js Express server with OpenTelemetry tracing and automatic secret/PII redaction.",
+      "expected_output": "The agent implements JSON logging formatting with trace_id correlation and automatic redaction of authorization headers and passwords.",
+      "files": [],
+      "expectations": [
+        "Structured JSON logger output configured",
+        "Automatic PII and secret key redaction middleware included",
+        "OpenTelemetry trace_id and span_id attached to log entries"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Define Prometheus alert rules for high HTTP 5xx error rate (>5%) and create an incident response runbook.",
+      "expected_output": "The agent constructs Prometheus alert rules in YAML and writes a structured incident response runbook in docs/runbooks/.",
+      "files": [],
+      "expectations": [
+        "Prometheus alert rule configured for 5xx error rate threshold",
+        "Incident response runbook created with triage steps and mitigations",
+        "Zero secrets or PII stored in alert rules or runbooks"
+      ]
+    }
+  ]
+}

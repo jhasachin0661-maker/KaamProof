@@ -1,0 +1,39 @@
+{
+  "skill_name": "dev-orchestrator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a full-stack SaaS task management web app with PostgreSQL, NextAuth, and a React dashboard.",
+      "expected_output": "The orchestrator generates a plan DAG using the SaaS profile, running core-repo-discovery first, followed by database migrations, backend services, UI components, auth, and quality gates.",
+      "files": [],
+      "expectations": [
+        "The orchestrator creates .agent/context/plan.md with DAG vertical slices",
+        "The first slice invokes core-repo-discovery to determine repository context",
+        "The execution sequence routes schema changes to database-migrations-orm before backend-service",
+        "Quality release gate is invoked in step mode after each vertical slice"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Fix a failing database connection error and update the authentication middleware tokens.",
+      "expected_output": "The orchestrator identifies change signals for database and auth files, routing to core-debugging, database-migrations-orm, and auth-authentication with human approval check for CRITICAL auth operations.",
+      "files": [],
+      "expectations": [
+        "The orchestrator routes auth middleware modifications to auth-authentication and security-secure-coding",
+        "The status report lists REQUIRES HUMAN REVIEW for authentication token changes",
+        "Failed steps are routed to core-debugging with a maximum of 2 remediation cycles"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Refactor the user profile page components and update UI styling.",
+      "expected_output": "The orchestrator routes frontend TSX changes through frontend-accessibility, testing-e2e-browser, and uiux-design-critique.",
+      "files": [],
+      "expectations": [
+        "The change signals for TSX/CSS files trigger frontend-accessibility and testing-e2e-browser",
+        "Risk level for frontend UI component edits is classified as LOW or MEDIUM",
+        "Final execution status is reported using the standard five statuses"
+      ]
+    }
+  ]
+}

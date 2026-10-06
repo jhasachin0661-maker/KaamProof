@@ -1,0 +1,27 @@
+{
+  "skill_name": "devops-containers",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Author a production multi-stage Dockerfile for a Next.js web application with Alpine Linux, non-root user execution, and .dockerignore.",
+      "expected_output": "The agent creates a multi-stage Dockerfile with builder and runner stages, USER non-root directive, and a complete .dockerignore file.",
+      "files": [],
+      "expectations": [
+        "Multi-stage build separates build chain from production runner image",
+        "Non-root USER is declared and configured before CMD",
+        ".dockerignore excludes node_modules, .git, and .env files"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a docker-compose.yml file configuring a Python FastAPI web service and a PostgreSQL database with health checks and volume persistence.",
+      "expected_output": "The agent generates a docker-compose.yml with depends_on healthcheck conditions, volume persistence, and environment variable configuration.",
+      "files": [],
+      "expectations": [
+        "FastAPI service depends on healthy PostgreSQL database service",
+        "Health check tests configured for both web service and database",
+        "Persistent volume mounted for PostgreSQL database data"
+      ]
+    }
+  ]
+}

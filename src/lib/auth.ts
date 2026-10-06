@@ -10,7 +10,6 @@ export type Role = "worker" | "employer";
 
 export interface Principal {
   userId: string;
-  email: string | null;
   phone: string;
   name: string;
   role: Role;
@@ -109,7 +108,6 @@ export async function getPrincipal(request: Request): Promise<Principal> {
 
   return {
     userId: row.user.id,
-    email: row.user.email,
     phone: row.user.phone,
     name: row.user.name,
     role,
@@ -129,9 +127,8 @@ export async function requireEmployer(request: Request): Promise<Principal> {
   return p;
 }
 
-export const publicUser = (p: Pick<Principal, "userId" | "email" | "phone" | "name" | "role">) => ({
+export const publicUser = (p: Pick<Principal, "userId" | "phone" | "name" | "role">) => ({
   id: p.userId,
-  email: p.email,
   phone: p.phone,
   name: p.name,
   role: p.role,

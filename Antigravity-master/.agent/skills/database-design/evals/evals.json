@@ -1,0 +1,38 @@
+{
+  "skill_name": "database-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design a relational PostgreSQL 16 database schema for an e-commerce platform with users, orders, and products.",
+      "expected_output": "The skill checks PostgreSQL version, defines 3NF tables with foreign keys, specifies composite indexes, and flags PII fields.",
+      "files": [],
+      "expectations": [
+        "Verifies PostgreSQL version compatibility from context",
+        "Defines 3NF table schemas with foreign key constraints and primary keys",
+        "Flags PII columns (email, address) for encryption and data retention"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Design a MongoDB document schema for a real-time messaging application with users and chat channels.",
+      "expected_output": "The skill models document collections, specifies index strategies, and enforces $jsonSchema validation.",
+      "files": [],
+      "expectations": [
+        "Models document collections and embedded vs referenced relationships",
+        "Defines compound indexes matching chat query access patterns",
+        "Specifies data design without applying changes to non-local databases"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Design a Redis caching schema for storing user session tokens and rate-limiting counters.",
+      "expected_output": "The skill specifies Redis data structures, TTL expiration policies, and key naming conventions.",
+      "files": [],
+      "expectations": [
+        "Selects appropriate Redis data structures (Hashes, Strings, Sets)",
+        "Configures TTL key expiration policies for session management",
+        "Establishes clean key namespace conventions"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "skill_name": "arch-system-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design the architecture for a seed-stage startup building an e-commerce platform with 3 developers.",
+      "expected_output": "The agent recommends a modular monolith with PostgreSQL to avoid over-engineering, generating an ADR.",
+      "files": [],
+      "expectations": [
+        "The agent selects a modular monolith architecture instead of premature microservices",
+        "An ADR is generated following the standard template in docs/adr/",
+        "Ops complexity and team size are explicitly cited as trade-off rationale"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Evaluate architecture trade-offs between serverless vs microservices for an event-driven telemetry ingest pipeline.",
+      "expected_output": "The agent scores both options using the decision matrix and outputs an ADR recommending serverless event processing.",
+      "files": [],
+      "expectations": [
+        "Architectural decision matrix is evaluated with detailed rationale",
+        "An ADR is output documenting trade-offs",
+        "Anti-overengineering rules are respected"
+      ]
+    }
+  ]
+}

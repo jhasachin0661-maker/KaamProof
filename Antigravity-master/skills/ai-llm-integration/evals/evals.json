@@ -1,0 +1,27 @@
+{
+  "skill_name": "ai-llm-integration",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build an OpenAI function tool calling handler with Zod structured output validation for a user extraction API.",
+      "expected_output": "The agent constructs type-safe OpenAI API invocation with Zod schema parsing and function tool execution loop.",
+      "files": [],
+      "expectations": [
+        "OpenAI API integration uses verified SDK parameters",
+        "Type-safe structured output validation enforced with Zod",
+        "Function tool execution loop parses arguments safely"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Implement prompt injection guardrails and token cost optimization for a customer support chatbot.",
+      "expected_output": "The agent isolates untrusted user input within tags, applies model routing, and configures sliding window context truncation.",
+      "files": [],
+      "expectations": [
+        "Untrusted user input isolated to prevent prompt injection",
+        "Token optimization via model tiering and sliding window context",
+        "Zero API keys or secrets exposed in prompt responses"
+      ]
+    }
+  ]
+}

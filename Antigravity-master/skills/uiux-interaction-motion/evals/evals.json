@@ -1,0 +1,27 @@
+{
+  "skill_name": "uiux-interaction-motion",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add GPU-accelerated hover scale micro-interactions and modal fade-in transitions with prefers-reduced-motion support.",
+      "expected_output": "The agent implements CSS transform/opacity transitions with a prefers-reduced-motion media query override.",
+      "files": [],
+      "expectations": [
+        "Animations use GPU-accelerated properties (transform, opacity)",
+        "Duration uses standard micro-interaction timing (150ms-300ms)",
+        "prefers-reduced-motion media query override is included"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a smooth skeleton pulse loading transition for a dashboard card component.",
+      "expected_output": "The agent creates CSS keyframe animation for pulse shimmer using opacity.",
+      "files": [],
+      "expectations": [
+        "Skeleton pulse animation implemented using CSS keyframes",
+        "Layout-thrashing properties avoided during animation",
+        "Accessibility reduced motion query respected"
+      ]
+    }
+  ]
+}

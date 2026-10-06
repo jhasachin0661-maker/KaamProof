@@ -1,0 +1,27 @@
+{
+  "skill_name": "frontend-accessibility",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit a React modal dialog component to ensure keyboard focus trapping, Escape key closing, and correct ARIA roles.",
+      "expected_output": "The agent inspects modal JSX, implements aria-modal='true', focus trapping, and Escape key handler.",
+      "files": [],
+      "expectations": [
+        "Modal includes role='dialog' and aria-modal='true'",
+        "Focus trapping and focus restoration on close are implemented",
+        "Escape key press listener closes the modal"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit a user registration form for WCAG 2.1 AA compliance including missing input labels and invalid ARIA attributes.",
+      "expected_output": "The agent updates form controls with associated labels, aria-describedby for error hints, and aria-invalid flags.",
+      "files": [],
+      "expectations": [
+        "All form controls are explicitly associated with <label> tags",
+        "Error messages are connected via aria-describedby and role='alert'",
+        "Keyboard focus navigation passes without focus trap bugs"
+      ]
+    }
+  ]
+}

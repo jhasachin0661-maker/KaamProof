@@ -1,0 +1,38 @@
+{
+  "skill_name": "auth-authentication",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement NextAuth (Auth.js) session authentication in Next.js with OAuth Google provider and secure cookies.",
+      "expected_output": "The skill configures Auth.js with Google provider, uses HttpOnly/Secure cookies, includes Threat Notes section, and labels design as REQUIRES HUMAN REVIEW.",
+      "files": [],
+      "expectations": [
+        "Configures Auth.js using vetted provider libraries without custom crypto",
+        "Enforces HttpOnly, Secure, and SameSite cookie flags",
+        "Includes mandatory Threat Notes section and REQUIRES HUMAN REVIEW label"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Implement JWT access token and refresh token rotation mechanism for a REST API.",
+      "expected_output": "The skill generates short-lived JWT access tokens, long-lived HTTP-only refresh cookies, and supports token revocation.",
+      "files": [],
+      "expectations": [
+        "Uses short-lived JWT access tokens and secure HTTP-only refresh cookies",
+        "Implements single-use refresh token rotation and revocation handling",
+        "Flags credential architecture change as CRITICAL risk"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Configure email/password user registration flow with Argon2id password hashing and TOTP MFA setup.",
+      "expected_output": "The skill uses Argon2id hashing, sets up RFC 6238 TOTP MFA, and reads client secrets strictly from environment variables.",
+      "files": [],
+      "expectations": [
+        "Applies Argon2id password hashing algorithm",
+        "Configures TOTP MFA authentication flow",
+        "Reads all client secrets strictly from environment variables"
+      ]
+    }
+  ]
+}

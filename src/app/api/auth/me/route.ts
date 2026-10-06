@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   }
 }
 
-/** Update own profile. Role, email and ids can never be changed here. */
+/** Update own profile. Role, phone and ids can never be changed here. */
 export async function PATCH(request: Request) {
   try {
     const p = await getPrincipal(request);

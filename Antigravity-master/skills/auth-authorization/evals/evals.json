@@ -1,0 +1,27 @@
+{
+  "skill_name": "auth-authorization",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement server-side RBAC middleware protecting user management endpoints and add IDOR checks on user profile lookup.",
+      "expected_output": "The agent implements deny-by-default server middleware, RBAC permission checks, scoped SQL/ORM user ID queries, and tags output with REQUIRES HUMAN REVIEW.",
+      "files": [],
+      "expectations": [
+        "Server-side authorization middleware enforces deny-by-default on all routes",
+        "IDOR ownership check is added to resource lookup queries",
+        "Output carries REQUIRES HUMAN REVIEW status tag"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Implement multi-tenant data isolation and API key scoping for a multi-tenant SaaS REST API.",
+      "expected_output": "The agent enforces tenant boundary validation middleware and scope-based API key checks.",
+      "files": [],
+      "expectations": [
+        "Tenant context is extracted from verified token and enforced on database queries",
+        "API key scopes are checked server-side for every request",
+        "Cross-tenant access attempts return HTTP 403 Forbidden"
+      ]
+    }
+  ]
+}

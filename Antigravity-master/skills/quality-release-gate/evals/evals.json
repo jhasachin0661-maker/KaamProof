@@ -1,0 +1,38 @@
+{
+  "skill_name": "quality-release-gate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run step-mode quality gate check after implementing the user login API endpoint slice.",
+      "expected_output": "The skill runs verified build and test commands for the slice, checks inputs and secrets, and outputs structured gate report.",
+      "files": [],
+      "expectations": [
+        "Executes verified build and lint commands recorded in project context",
+        "Evaluates slice changes against Code and Backend security check groups",
+        "Generates gate report via gate_report.py script with status evidence"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Perform final release gate audit before deploying release v1.0.0 of our web application.",
+      "expected_output": "The skill performs comprehensive check matrix review across all 7 categories and issues final gate verdict.",
+      "files": [],
+      "expectations": [
+        "Audits all 7 check categories (Code, Security, UI, Backend, DB, Deployment, Docs)",
+        "Assigns clear statuses with empirical evidence or N/A justifications",
+        "Marks gate status as FAILED if any check fails, never claiming everything is perfect"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Check quality gate for a release containing custom crypto and payment integration changes.",
+      "expected_output": "The skill tags crypto and payment checks with REQUIRES HUMAN REVIEW status and presents evidence.",
+      "files": [],
+      "expectations": [
+        "Labels payment flows and crypto design checks as REQUIRES HUMAN REVIEW",
+        "Applies verified evidence rules to code and test build checks",
+        "Renders gate audit report using python scripts/gate_report.py"
+      ]
+    }
+  ]
+}

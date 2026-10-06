@@ -1,0 +1,38 @@
+{
+  "skill_name": "frontend-web-app",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a React component displaying user dashboard metrics with loading, empty, and error views.",
+      "expected_output": "The skill checks React version in package.json, implements loading skeleton, empty state, error fallback, and safe rendering.",
+      "files": [],
+      "expectations": [
+        "Checks React version in package.json before writing component",
+        "Provides explicit loading, empty, and error states for dashboard data view",
+        "Prevents unsanitized HTML injection and secret leaks in client bundle"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a user registration form in Next.js App Router with Zod schema validation.",
+      "expected_output": "The skill verifies Next.js version, uses 'use client' directive appropriately, integrates form validation, and handles submit state.",
+      "files": [],
+      "expectations": [
+        "Checks Next.js version and handles App Router / RSC directives correctly",
+        "Integrates schema validation using Zod for client and server inputs",
+        "Verifies build and typecheck exit code 0"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Refactor a Vue 3 component to use Composition API with script setup and Tailwind styling.",
+      "expected_output": "The skill verifies Vue version, converts component to Composition API, applies Tailwind utilities, and ensures type safety.",
+      "files": [],
+      "expectations": [
+        "Verifies Vue 3 version from package.json",
+        "Uses Composition API with script setup lang=ts",
+        "Organizes Tailwind CSS utility classes logically"
+      ]
+    }
+  ]
+}

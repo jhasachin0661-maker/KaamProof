@@ -5,6 +5,7 @@ import {
   Play,
   Square,
   ShieldCheck,
+  BadgeCheck,
   CheckCircle2,
   Clock,
   MapPin,
@@ -40,6 +41,8 @@ import { translations, Lang } from "@/lib/i18n";
 import type { UserData, WorkerProfile, Relationship, WorkSession, Payment, Dispute, Certificate, Anomaly, WorkerMetrics } from "@/lib/types";
 import { PendingRequests } from "@/components/PendingRequests";
 import { ChangePasswordCard } from "@/components/ChangePasswordCard";
+import { MobileHeader } from "@/components/mobile/MobileHeader";
+import { BottomNavigation } from "@/components/mobile/BottomNavigation";
 
 const newKey = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
 const subscribeOnline = (cb: () => void) => {
@@ -100,9 +103,16 @@ export default function KaamProofApp() {
 
   // Modals
   const [showNewPaymentModal, setShowNewPaymentModal] = useState<boolean>(false);
+  const [paymentReview, setPaymentReview] = useState(false);
+  const [selectedEmployerWorker, setSelectedEmployerWorker] = useState<Relationship | null>(null);
+  const [employerWorkerSearch, setEmployerWorkerSearch] = useState("");
   const [showDisputeModal, setShowDisputeModal] = useState<boolean>(false);
   const [showAddEmployerModal, setShowAddEmployerModal] = useState<boolean>(false);
   const [showCertificateModal, setShowCertificateModal] = useState<Certificate | null>(null);
+  const [certificateQrLoading, setCertificateQrLoading] = useState(false);
+  const [certificateQrError, setCertificateQrError] = useState(false);
+  const [showStartWorkSheet, setShowStartWorkSheet] = useState(false);
+  const [showEndWorkSheet, setShowEndWorkSheet] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("");
 
   // Form states
@@ -215,7 +225,7 @@ export default function KaamProofApp() {
     await refreshAllData(SESSION_MARKER, data.user);
   };
 
-  // Phone + OTP Flow (server sets an HttpOnly cookie on verify)
+  // Password authentication (server sets an HttpOnly session cookie)
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -359,7 +369,7 @@ export default function KaamProofApp() {
   );
 
   // Start Work Session (KAAM SHURU)
-  const handleStartWork = async () => {
+  const executeStartWork = async () => {
     if (!user) return;
     if (!relationships.some((r) => r.status === "active")) {
       setShowAddEmployerModal(true);
@@ -416,9 +426,19 @@ export default function KaamProofApp() {
     }
   };
 
+  const handleStartWork = () => {
+    if (!user) return;
+    if (!relationships.some((r) => r.status === "active")) {
+      setShowAddEmployerModal(true);
+      showToast("à¤•à¤¾à¤® à¤¶à¥à¤°à¥‚ à¤•à¤°à¤¨à¥‡ à¤¸à¥‡ à¤ªà¤¹à¤²à¥‡ à¤…à¤ªà¤¨à¥‡ employer à¤•à¥‹ à¤œà¥‹à¤¡à¤¼à¥‡à¤‚।", "info");
+      return;
+    }
+    setShowStartWorkSheet(true);
+  };
+
   // End Work Session (KAAM KHATAM) — works offline too: the end is queued and refers to the shift
   // by its server id, or by the START's idempotency key when that start is itself still queued.
-  const handleEndWork = async () => {
+  const executeEndWork = async () => {
     const serverSession = metrics?.activeSession;
     if ((!serverSession && !queuedOpenStart) || !user) {
       showToast("कोई खुला कार्य सत्र नहीं है", "error");
@@ -473,6 +493,8 @@ export default function KaamProofApp() {
       setActionLoading(false);
     }
   };
+
+  const handleEndWork = () => setShowEndWorkSheet(true);
 
   // Offline queue: events keep their idempotency key, survive reloads, and are only removed once the
   // server accepted them (or reported a duplicate). Failed events stay queued — never silently lost.
@@ -613,6 +635,10 @@ export default function KaamProofApp() {
   const handleCreatePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !accessToken || relationships.length === 0) return;
+    if (!paymentReview) {
+      setPaymentReview(true);
+      return;
+    }
 
     try {
       setActionLoading(true);
@@ -633,6 +659,7 @@ export default function KaamProofApp() {
       });
       if (res.ok) {
         setShowNewPaymentModal(false);
+        setPaymentReview(false);
         showToast("Payment record saved successfully!", "success");
         await refreshAllData(accessToken, user);
       }
@@ -740,12 +767,18 @@ export default function KaamProofApp() {
 
   const viewCertificate = async (cert: Certificate) => {
     setShowCertificateModal(cert);
+    setCertificateQrLoading(true);
+    setCertificateQrError(false);
+    setQrCodeDataUrl("");
     try {
       const publicVerifyUrl = `${window.location.origin}/verify/${cert.certificateNumber}`;
       const qrData = await QRCode.toDataURL(publicVerifyUrl, { margin: 1, width: 200 });
       setQrCodeDataUrl(qrData);
     } catch (e) {
       console.error(e);
+      setCertificateQrError(true);
+    } finally {
+      setCertificateQrLoading(false);
     }
   };
 
@@ -894,7 +927,7 @@ export default function KaamProofApp() {
 
   if (!user || !accessToken) {
     return (
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white">
+      <div className="kp-auth-page min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white">
         {/* Top Bar */}
         <header className="border-b border-slate-200 bg-white/90 backdrop-blur-xl px-5 py-4 sm:px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -943,10 +976,10 @@ export default function KaamProofApp() {
         )}
 
         {/* Main Login / Registration Card */}
-        <main className="flex-1 flex items-center justify-center px-5 py-10 sm:px-8 lg:py-16">
+        <main className="kp-auth-main flex-1 flex items-center justify-center px-5 py-10 sm:px-8 lg:py-16">
           <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-[0.92fr_1.08fr] gap-10 lg:gap-16 items-center">
             {/* Left Info Column */}
-            <div className="space-y-6">
+            <div className="kp-auth-intro space-y-6">
               <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">
                 <ShieldCheck className="w-4 h-4" />
                 <span>Secure password authentication</span>
@@ -990,7 +1023,7 @@ export default function KaamProofApp() {
             </div>
 
             {/* Right Auth Card */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/10 sm:p-9 space-y-7">
+            <div className="kp-auth-card rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/10 sm:p-9 space-y-7">
               {/* Role Selector Toggle */}
               <div>
                   <label className="mb-3 block text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
@@ -1002,7 +1035,7 @@ export default function KaamProofApp() {
                     onClick={() => {
                       setSelectedAuthRole("worker");
                     }}
-                    className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                    className={`kp-role-card p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedAuthRole === "worker"
                         ? "bg-blue-50 border-blue-600 text-slate-950 shadow-md shadow-blue-600/10"
                         : "bg-slate-50 border-slate-200 text-slate-500 hover:border-blue-300"
@@ -1029,7 +1062,7 @@ export default function KaamProofApp() {
                     onClick={() => {
                       setSelectedAuthRole("employer");
                     }}
-                    className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                    className={`kp-role-card p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedAuthRole === "employer"
                         ? "bg-blue-50 border-blue-600 text-slate-950 shadow-md shadow-blue-600/10"
                         : "bg-slate-50 border-slate-200 text-slate-500 hover:border-blue-300"
@@ -1087,7 +1120,7 @@ export default function KaamProofApp() {
                       </div>
                     )}
                     <button type="submit" disabled={actionLoading} data-auth-submit={authMode}
-                       className="auth-submit flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-black tracking-wide text-white transition-colors hover:bg-blue-700 cursor-pointer disabled:opacity-50">
+                       className="auth-submit kp-auth-submit flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-black tracking-wide text-white transition-colors hover:bg-blue-700 cursor-pointer disabled:opacity-50">
                       <Lock className="w-4 h-4" />
                       <span>{actionLoading ? "कृपया प्रतीक्षा करें..." : "OTP भेजें (Send OTP)"}</span>
                       <ArrowRight className="w-4 h-4" />
@@ -1144,13 +1177,7 @@ export default function KaamProofApp() {
 
   return (
     <div className="kp-dashboard min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
-      <header className="mobile-app-bar md:hidden">
-        <div className="mobile-brand-mark">क</div>
-        <span className="mobile-brand-name">KaamProof</span>
-        <button type="button" aria-label="Open profile" onClick={() => setActiveTab("profile")} className="mobile-profile-button">
-          <User className="h-5 w-5" />
-        </button>
-      </header>
+      <MobileHeader appName={t.appName} onProfile={() => setActiveTab("profile")} />
       {/* Top Authenticated Security Bar */}
       <header className="hidden md:flex bg-stone-900 border-b border-stone-800 px-4 sm:px-8 py-2 flex-wrap items-center justify-between text-xs gap-3">
         <div className="flex items-center gap-2">
@@ -1159,7 +1186,7 @@ export default function KaamProofApp() {
             {isWorker ? "WORKER ACCOUNT (ISOLATED DATA)" : "EMPLOYER + ADMIN ACCESS"}
           </span>
           <span className="text-stone-300 font-medium">
-            {user.name} ({user.email || user.phone})
+            {user.name} ({user.phone})
           </span>
         </div>
 
@@ -1245,7 +1272,7 @@ export default function KaamProofApp() {
       {/* Notification Toast */}
       {notification && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-5">
-          <div
+          <div role="status" aria-live="polite"
             className={`px-4 py-3 rounded-xl shadow-2xl border flex items-center gap-3 text-sm font-medium ${
               notification.type === "success"
                 ? "bg-emerald-900 border-emerald-600 text-emerald-100"
@@ -1353,9 +1380,9 @@ export default function KaamProofApp() {
                 {relationships.length === 0 && (
                   <div className="bg-amber-950/40 border border-amber-500/50 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="space-y-1">
-                      <h3 className="text-base font-bold text-white">
+                    <div className="kp-profile-card-heading"><div className="kp-profile-avatar">{user.name.slice(0, 1).toUpperCase()}</div><div><p className="kp-profile-eyebrow">WORK PASSPORT · PROFILE</p><h3 className="text-base font-bold text-white">
                         नया खाता तैयार है! काम शुरू करने के लिए अपने नियोक्ता (Employer) को जोड़ें
-                      </h3>
+                    </h3></div><span className="kp-profile-verified"><BadgeCheck className="h-4 w-4" /> Verified</span></div>
                       <p className="text-xs text-stone-300">
                         अपने नियोक्ता का नाम या मोबाइल नंबर दर्ज करके पारस्परिक मजदूरी समझौता (Wage Agreement v1) सक्रिय करें।
                       </p>
@@ -1562,7 +1589,7 @@ export default function KaamProofApp() {
 
                 {/* WORKER TAB 2: WORK HISTORY */}
                 {activeTab === "history" && (
-                  <div className="space-y-4">
+                  <div className="worker-history-screen space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-bold text-white">
@@ -1586,7 +1613,7 @@ export default function KaamProofApp() {
                         sessions.map((s) => (
                           <div
                             key={s.id}
-                            className="p-4 rounded-xl bg-stone-900/70 border border-stone-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm"
+                            className="mobile-work-card p-4 rounded-xl bg-stone-900/70 border border-stone-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm"
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
@@ -1632,7 +1659,7 @@ export default function KaamProofApp() {
 
                 {/* WORKER TAB 3: PAISA */}
                 {activeTab === "paisa" && (
-                  <div className="space-y-6">
+                  <div className="worker-payments-screen space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-bold text-white">मेरा वेतन एवं भुगतान बहीखाता</h3>
@@ -1658,7 +1685,7 @@ export default function KaamProofApp() {
                         paymentsList.map((p) => (
                           <div
                             key={p.id}
-                            className="p-4 rounded-xl bg-stone-900/70 border border-stone-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm"
+                            className="mobile-payment-card p-4 rounded-xl bg-stone-900/70 border border-stone-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm"
                           >
                             <div>
                               <div className="flex items-center gap-2">
@@ -1697,7 +1724,7 @@ export default function KaamProofApp() {
 
                 {/* WORKER TAB 4: PASSPORT */}
                 {activeTab === "passport" && (
-                  <div className="space-y-6">
+                  <div className="worker-passport-screen space-y-6">
                     <div className="bg-gradient-to-br from-stone-900 via-stone-900 to-emerald-950/40 border border-emerald-800/40 rounded-3xl p-6 sm:p-8 space-y-6">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-800 pb-4">
                         <div>
@@ -1720,6 +1747,11 @@ export default function KaamProofApp() {
                       </div>
 
                       <div className="space-y-2">
+                        <div className="mobile-passport-timeline">
+                          <h3>काम का इतिहास</h3>
+                          {relationships.filter((rel) => rel.status === "active").map((rel) => <div className="mobile-timeline-item" key={rel.id}><span className="mobile-timeline-dot" /><div><strong>{rel.roleTitle}</strong><p>{rel.employerName} · ₹{rel.agreement?.wageAmount ?? "—"} / {rel.agreement?.wageType ?? "—"}</p><small>सक्रिय रोजगार</small></div></div>)}
+                          {relationships.filter((rel) => rel.status === "active").length === 0 && <p className="mobile-muted-state">अभी कोई रोजगार इतिहास उपलब्ध नहीं है।</p>}
+                        </div>
                         {certificatesList.length === 0 ? (
                           <div className="p-6 text-center text-xs text-stone-400 bg-stone-950/50 rounded-xl border border-stone-800">
                             अभी कोई प्रमाणपत्र जारी नहीं हुआ है। ऊपर बटन दबाकर अपना पहला प्रमाणपत्र बनाएं।
@@ -1818,7 +1850,7 @@ export default function KaamProofApp() {
 
                 {/* WORKER TAB 6: PROFILE */}
                 {activeTab === "profile" && (
-                  <div className="bg-stone-900 p-6 rounded-2xl border border-stone-800 max-w-xl space-y-3 text-sm">
+                  <div className="kp-profile-card bg-stone-900 p-6 rounded-2xl border border-stone-800 max-w-xl space-y-3 text-sm">
                     <h3 className="text-base font-bold text-white">मेरी सत्यापित प्रोफाइल</h3>
                     <div>
                       <span className="text-xs text-stone-400 block">नाम:</span>
@@ -1827,7 +1859,7 @@ export default function KaamProofApp() {
                     <div>
                       <span className="text-xs text-stone-400 block">पंजीकृत फोन / ईमेल:</span>
                       <span className="font-mono text-emerald-400">
-                        {user.email || user.phone}
+                        {user.phone}
                       </span>
                     </div>
                     <div>
@@ -1849,7 +1881,15 @@ export default function KaamProofApp() {
             {isEmployerOrAdmin && (
               <div className="space-y-6">
                 {employerWorkspaceMode === "employer" ? (
-                  <div className="space-y-6">
+                  <div className="employer-workspace space-y-6">
+                    <div className="employer-mobile-intro md:hidden">
+                      <p>Employer workspace</p>
+                      <h1>नमस्ते, {user.name}</h1>
+                      <span>आज का काम और pending actions एक जगह देखें।</span>
+                    </div>
+                    <div className="employer-mobile-nav md:hidden" aria-label="Employer navigation">
+                      {[{ id: "employer-home", label: "Home", icon: Play }, { id: "employer-workers", label: "Workers", icon: User }, { id: "employer-work", label: "Work", icon: History }, { id: "employer-payments", label: "Payments", icon: DollarSign }, { id: "employer-more", label: "More", icon: Award }].map(({ id, label, icon: Icon }) => <button key={id} type="button" onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })}><Icon className="h-5 w-5" aria-hidden="true" /><span>{label}</span></button>)}
+                    </div>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-800 pb-4">
                       <div>
                         <h2 className="text-2xl font-black text-white">
@@ -1879,7 +1919,7 @@ export default function KaamProofApp() {
                     </div>
 
                     {/* Employer Stats */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div id="employer-home" className="employer-summary-grid grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div className="p-4 rounded-xl bg-stone-900 border border-stone-800">
                         <span className="text-xs text-stone-400 font-medium">पुष्टि हेतु लंबित</span>
                         <div className="text-2xl font-black text-amber-400 mt-1">
@@ -1907,12 +1947,13 @@ export default function KaamProofApp() {
                     </div>
 
                     {/* Connected Workers & Versioned Wage Agreements */}
-                    <div className="space-y-3">
+                    <div id="employer-workers" className="employer-section space-y-3">
                       <h3 className="text-base font-bold text-white">
                         जुड़े हुए श्रमिक एवं मजदूरी अनुबंध (Versioned Wage Agreements)
                       </h3>
+                      <label className="employer-search-field"><span className="sr-only">Search workers</span><input type="search" value={employerWorkerSearch} onChange={(event) => setEmployerWorkerSearch(event.target.value)} placeholder="Search workers" /></label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {relationships.map((rel) => (
+                        {relationships.filter((rel) => `${rel.workerName} ${rel.roleTitle}`.toLowerCase().includes(employerWorkerSearch.toLowerCase())).map((rel) => (
                           <div
                             key={rel.id}
                             className="p-4 rounded-xl bg-stone-900/70 border border-stone-800 flex items-center justify-between gap-3 text-sm"
@@ -1927,6 +1968,7 @@ export default function KaamProofApp() {
                                 </strong>
                               </div>
                             </div>
+                            <button type="button" onClick={() => setSelectedEmployerWorker(rel)} className="employer-view-worker">View worker</button>
                             <button
                               onClick={() =>
                                 handleUpgradeAgreementVersion(
@@ -1944,7 +1986,7 @@ export default function KaamProofApp() {
                     </div>
 
                     {/* Pending Confirmation Queue */}
-                    <div className="space-y-4">
+                    <div id="employer-work" className="employer-section space-y-4">
                       <h3 className="text-base font-bold text-white flex items-center gap-2">
                         <Clock className="w-4 h-4 text-amber-400" />
                         <span>श्रमिक उपस्थिति पुष्टि कतार (Pending Confirmation Queue)</span>
@@ -2023,7 +2065,7 @@ export default function KaamProofApp() {
                     </div>
 
                     {/* AI Anomaly Queue */}
-                    <div className="space-y-4">
+                    <div id="employer-payments" className="employer-section space-y-4">
                       <h3 className="text-base font-bold text-white flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-amber-400" />
                         <span>एआई विसंगति समीक्षा कतार (AI Anomaly Review Queue)</span>
@@ -2160,6 +2202,45 @@ export default function KaamProofApp() {
         )}
       </main>
 
+      {selectedEmployerWorker && (
+        <div className="mobile-sheet-backdrop" role="presentation" onClick={() => setSelectedEmployerWorker(null)}>
+          <section className="mobile-action-sheet employer-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="employer-worker-detail-title" onClick={(event) => event.stopPropagation()}>
+            <div className="mobile-sheet-handle" />
+            <h2 id="employer-worker-detail-title">{selectedEmployerWorker.workerName}</h2>
+            <p className="mobile-sheet-copy">Worker relationship and recent operational status.</p>
+            <div className="mobile-review-list"><div><span>काम</span><strong>{selectedEmployerWorker.roleTitle}</strong></div><div><span>स्थिति</span><strong>{selectedEmployerWorker.status}</strong></div><div><span>मजदूरी</span><strong>₹{selectedEmployerWorker.agreement?.wageAmount ?? "—"} / {selectedEmployerWorker.agreement?.wageType ?? "—"}</strong></div><div><span>Pending sessions</span><strong>{sessions.filter((session) => session.workerId === selectedEmployerWorker.workerId && session.status === "pending_confirmation").length}</strong></div></div>
+            <button type="button" onClick={() => { setSelectedEmployerWorker(null); setShowNewPaymentModal(true); }} className="mobile-sheet-primary"><DollarSign className="h-5 w-5" />Record payment</button>
+            <button type="button" onClick={() => setSelectedEmployerWorker(null)} className="mobile-sheet-secondary">Close</button>
+          </section>
+        </div>
+      )}
+
+      {showStartWorkSheet && (
+        <div className="mobile-sheet-backdrop" role="presentation" onClick={() => setShowStartWorkSheet(false)}>
+          <section className="mobile-action-sheet" role="dialog" aria-modal="true" aria-labelledby="start-work-title" onClick={(event) => event.stopPropagation()}>
+            <div className="mobile-sheet-handle" />
+            <h2 id="start-work-title">आज का काम शुरू करें</h2>
+            <p className="mobile-sheet-copy">काम शुरू करने से पहले विवरण जाँच लें। स्थान की अनुमति केवल रिकॉर्ड शुरू करते समय माँगी जाएगी।</p>
+            {(() => { const rel = relationships.find((item) => item.status === "active"); return rel ? <div className="mobile-review-list"><div><span>नियोक्ता</span><strong>{rel.employerName}</strong></div><div><span>काम</span><strong>{rel.roleTitle}</strong></div><div><span>मजदूरी</span><strong>₹{rel.agreement?.wageAmount ?? "—"} / {rel.agreement?.wageType ?? "—"}</strong></div><div><span>समय</span><strong>{new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong></div></div> : null; })()}
+            <button type="button" disabled={actionLoading} onClick={async () => { setShowStartWorkSheet(false); await executeStartWork(); }} className="mobile-sheet-primary"><Play className="h-5 w-5 fill-current" />काम शुरू करें</button>
+            <button type="button" onClick={() => setShowStartWorkSheet(false)} className="mobile-sheet-secondary">अभी नहीं</button>
+          </section>
+        </div>
+      )}
+
+      {showEndWorkSheet && (
+        <div className="mobile-sheet-backdrop" role="presentation" onClick={() => setShowEndWorkSheet(false)}>
+          <section className="mobile-action-sheet" role="dialog" aria-modal="true" aria-labelledby="end-work-title" onClick={(event) => event.stopPropagation()}>
+            <div className="mobile-sheet-handle" />
+            <h2 id="end-work-title">काम समाप्त करें?</h2>
+            <p className="mobile-sheet-copy">सत्र समाप्त करने से पहले अपनी आज की काम की जानकारी जाँच लें।</p>
+            <div className="mobile-review-list"><div><span>शुरू हुआ</span><strong>{metrics?.activeSession?.serverStartReceivedAt ? new Date(metrics.activeSession.serverStartReceivedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "ऑफ़लाइन सत्र"}</strong></div><div><span>नियोक्ता</span><strong>{relationships.find((item) => item.status === "active")?.employerName ?? "—"}</strong></div><div><span>स्थिति</span><strong>काम चल रहा है</strong></div></div>
+            <button type="button" disabled={actionLoading} onClick={async () => { setShowEndWorkSheet(false); await executeEndWork(); }} className="mobile-sheet-primary danger"><Square className="h-5 w-5 fill-current" />काम खत्म करें</button>
+            <button type="button" onClick={() => setShowEndWorkSheet(false)} className="mobile-sheet-secondary">वापस जाएँ</button>
+          </section>
+        </div>
+      )}
+
       {/* MODAL 1: CERTIFICATE PREVIEW & QR */}
       {showCertificateModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -2189,7 +2270,9 @@ export default function KaamProofApp() {
                 {showCertificateModal.periodStart} से {showCertificateModal.periodEnd}
               </div>
 
-              {qrCodeDataUrl && (
+              {certificateQrLoading && <div className="certificate-state" role="status">QR verification तैयार हो रहा है…</div>}
+              {certificateQrError && <div className="certificate-state error" role="alert">QR अभी तैयार नहीं हो पाया। Verification page खोलकर फिर कोशिश करें।</div>}
+              {qrCodeDataUrl && !certificateQrLoading && (
                 <div className="pt-2 flex flex-col items-center">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -2247,6 +2330,8 @@ export default function KaamProofApp() {
                 ✕
               </button>
             </div>
+
+            {paymentReview && <div className="payment-review-banner" role="status"><strong>Review payment before saving</strong><span>₹{paymentAmount} · {paymentMethod}</span></div>}
 
             <div className="space-y-3 text-sm">
               <div>
@@ -2430,11 +2515,11 @@ export default function KaamProofApp() {
 
                   <div>
                     <label className="text-xs text-stone-400 block mb-1">
-                      कर्मचारी/नियोक्ता का पंजीकृत ईमेल (Registered email)
+                      कर्मचारी/नियोक्ता का पंजीकृत मोबाइल नंबर (Registered mobile number)
                     </label>
                     <input
                       type="text"
-                      placeholder="उदा. 9811223344 या email@domain.com"
+                      placeholder="उदा. 9811223344"
                       value={counterpartyIdentifier}
                       onChange={(e) => setCounterpartyIdentifier(e.target.value)}
                       className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-white text-xs"
@@ -2486,21 +2571,7 @@ export default function KaamProofApp() {
         </div>
       )}
 
-      {isWorker && (
-        <nav className="mobile-bottom-nav md:hidden" aria-label="Primary navigation">
-          {[
-            { id: "home", label: "Home", icon: Play },
-            { id: "history", label: "Work", icon: History },
-            { id: "paisa", label: "Pay", icon: DollarSign },
-            { id: "passport", label: "Passport", icon: Award },
-            { id: "profile", label: "More", icon: User },
-          ].map((item) => {
-            const Icon = item.icon;
-            const active = activeTab === item.id;
-            return <button key={item.id} type="button" onClick={() => setActiveTab(item.id)} className={active ? "active" : ""} aria-current={active ? "page" : undefined}><Icon className="h-5 w-5" /><span>{item.label}</span></button>;
-          })}
-        </nav>
-      )}
+      {isWorker && <BottomNavigation items={[{ id: "home", label: "Home", icon: Play }, { id: "history", label: "Work", icon: History }, { id: "paisa", label: "Pay", icon: DollarSign }, { id: "passport", label: "Passport", icon: Award }, { id: "profile", label: "More", icon: User }]} activeId={activeTab} onChange={setActiveTab} />}
 
       {/* Footer */}
       <footer className="border-t border-stone-900 bg-stone-950 px-4 py-6 text-center text-xs text-stone-400">

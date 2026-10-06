@@ -1,0 +1,27 @@
+{
+  "skill_name": "data-pipelines-analytics",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build an ETL pipeline that ingests a CSV of sales data, validates the schema (date, product, quantity, price), cleans nulls, and loads into a SQLite database.",
+      "expected_output": "The agent creates a pipeline that validates CSV schema, handles missing values, and loads clean data into SQLite with idempotent upserts.",
+      "files": [],
+      "expectations": [
+        "Schema validation rejects rows with missing required fields",
+        "Null handling strategy documented (drop, fill, or quarantine)",
+        "Pipeline is idempotent on rerun"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write SQL analytics queries for monthly revenue trends, top products by revenue, and customer retention cohorts from the sales database.",
+      "expected_output": "The agent writes CTEs and window functions for revenue trends, product rankings, and cohort analysis.",
+      "files": [],
+      "expectations": [
+        "Monthly revenue uses date truncation and GROUP BY",
+        "Top products use ranking window function",
+        "Cohort analysis tracks first purchase date and retention"
+      ]
+    }
+  ]
+}

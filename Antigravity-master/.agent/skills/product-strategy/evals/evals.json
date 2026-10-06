@@ -1,0 +1,27 @@
+{
+  "skill_name": "product-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Evaluate a new SaaS product concept for AI document processing, score 5 candidate features using RICE, and define the MVP scope.",
+      "expected_output": "The agent scores features using RICE, separates Must-have features from deferred scope, and outputs an MVP scoping document.",
+      "files": [],
+      "expectations": [
+        "Feature backlog is scored using the RICE formula",
+        "MVP boundaries are explicitly defined with in-scope and out-of-scope lists",
+        "Product launch checklist is provided"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Conduct feasibility analysis and MoSCoW prioritization for a real-time collaborative whiteboard app.",
+      "expected_output": "The agent categorizes features into Must, Should, Could, and Won't-have buckets, assessing technical constraints.",
+      "files": [],
+      "expectations": [
+        "Features categorized using MoSCoW framework",
+        "Technical feasibility and operational risks documented",
+        "Lean MVP scope bounded cleanly"
+      ]
+    }
+  ]
+}

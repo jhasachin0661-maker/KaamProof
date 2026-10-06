@@ -1,0 +1,38 @@
+{
+  "skill_name": "quality-code-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Perform code review on a pull request that introduces an unhandled null exception bug in a user controller file.",
+      "expected_output": "The skill identifies the null pointer vulnerability, ranks it as BLOCKING severity with exact file:line evidence, and proposes a fix.",
+      "files": [],
+      "expectations": [
+        "Ranks unhandled null exception bug as BLOCKING severity",
+        "Provides precise file path and line number reference",
+        "Includes concrete proposed code fix"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review a code submission that duplicates 3 lines of logging across two methods and suggests over-abstracting them with a new factory class.",
+      "expected_output": "The skill applies DRY/KISS principles with pragmatic judgment, advising against unnecessary factory abstraction.",
+      "files": [],
+      "expectations": [
+        "Evaluates DRY/KISS principles pragmatically without over-engineering",
+        "Advises against introducing complex factory class for minor duplication",
+        "Categorizes suggestions into SHOULD-FIX or NIT buckets"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run static analysis checks and perform code review on modified payment service files.",
+      "expected_output": "The skill runs linter and typecheck tools, categorizes findings into ranked buckets with line evidence, and remains read-only.",
+      "files": [],
+      "expectations": [
+        "Executes available linter and typecheck static analysis commands",
+        "Ranks review findings into BLOCKING, SHOULD-FIX, and NIT categories",
+        "Maintains read-only review status without mutating codebase files"
+      ]
+    }
+  ]
+}

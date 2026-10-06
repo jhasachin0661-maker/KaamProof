@@ -1,0 +1,16 @@
+{
+  "project": {"name": "KaamProof", "mode": "existing", "profile": "Full-Stack App", "data_sensitivity": "personal work and authentication data"},
+  "stack": {"framework": "Next.js 16.3.5", "language": ["TypeScript", "JavaScript"], "orm": "Drizzle", "database": "PostgreSQL", "styling": "TailwindCSS"},
+  "commands": {
+    "lint": {"cmd": "npm.cmd run lint", "verified": true, "last_exit": 0},
+    "typecheck": {"cmd": "npm.cmd run typecheck", "verified": true, "last_exit": 0},
+    "build": {"cmd": "npm.cmd run build", "verified": true, "last_exit": 0},
+    "e2e": {"cmd": "npm.cmd run test:e2e", "verified": false, "last_exit": null},
+    "idor": {"cmd": "npm.cmd run test:idor", "verified": false, "last_exit": null}
+  },
+  "environment": {"target": "isolated development database required", "production_deploy": "not authorized"},
+  "status": {"build": "PASS", "lint": "PASS", "types": "PASS", "runtime": "UNVERIFIED", "browser": "UNVERIFIED", "security": "REQUIRES HUMAN REVIEW"},
+  "known_issues": ["Database credential exists in local .env and must be rotated before launch", "Runtime DB, E2E, IDOR, browser, accessibility, performance, deployment, monitoring and backup evidence are missing"],
+  "assumptions": ["PRD requests verification and release readiness, not a new feature phase"],
+  "next_actions": ["Secure local environment", "Run isolated DB verification", "Run worker/employer/certificate/IDOR tests", "Perform browser QA", "Create final launch readiness document"]
+}

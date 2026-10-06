@@ -1,0 +1,38 @@
+{
+  "skill_name": "core-repo-discovery",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just cloned this repo. Discover the project stack, scripts, and build commands.",
+      "expected_output": "The skill runs detect_stack.py, discovers the manifest files, executes build/test commands to verify exit codes, and updates project-context.json.",
+      "files": [],
+      "expectations": [
+        "The skill executes python scripts/detect_stack.py to analyze workspace manifests",
+        "Discovered build, test, and lint commands are executed and exit codes are recorded",
+        "Stack information is saved in .agent/context/project-context.json under stack and commands keys"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What frameworks, database, and package manager does this codebase use?",
+      "expected_output": "The skill inspects package manifests and ORM configs to identify languages, frameworks, and database tools.",
+      "files": [],
+      "expectations": [
+        "The output lists languages, frameworks, ORMs, and package manager without guessing",
+        "The handoff file contains an empirical summary of discovered project dependencies",
+        "No .env secrets or API keys are printed in the discovery output"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run the project test suite and record whether the test command succeeds.",
+      "expected_output": "The skill identifies the exact test command from the manifest, executes it, and records the exit code in context.",
+      "files": [],
+      "expectations": [
+        "The test command is executed directly rather than assumed",
+        "The exit code of the test command is recorded under commands.test.last_exit",
+        "The status of the test suite is updated in project-context.json"
+      ]
+    }
+  ]
+}

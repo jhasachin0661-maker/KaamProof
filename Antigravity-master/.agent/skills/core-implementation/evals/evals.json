@@ -1,0 +1,38 @@
+{
+  "skill_name": "core-implementation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add a new API endpoint GET /api/v1/health that returns status ok and current server uptime.",
+      "expected_output": "The skill inspects existing API conventions, writes the endpoint using smallest safe diff, and verifies the build exit code.",
+      "files": [],
+      "expectations": [
+        "The skill inspects project-context.json and existing routes to match module and export conventions",
+        "A git checkpoint or stash is created before multi-file edits",
+        "The build and typecheck commands are executed and exit code 0 is verified"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Scaffold a new Next.js 15 app with TypeScript, TailwindCSS, and ESLint in greenfield mode.",
+      "expected_output": "The skill uses official non-interactive CLI generator commands to initialize the project in ./.",
+      "files": [],
+      "expectations": [
+        "Official non-interactive generator command is executed with -y flag in ./",
+        "The scaffolded structure matches official Next.js App Router layout conventions",
+        "No existing files outside the scaffolded directory are modified or destroyed"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Install lodash-es dependency and use it to group tasks by priority in our TaskBoard component.",
+      "expected_output": "The skill flags adding lodash-es as MEDIUM risk with justification, installs it, updates code matching style, and runs lint/typecheck.",
+      "files": [],
+      "expectations": [
+        "Adding new dependency is logged as MEDIUM risk with explicit justification",
+        "Component edits match existing TypeScript types and styling conventions",
+        "Typecheck and lint commands pass clean with exit code 0"
+      ]
+    }
+  ]
+}

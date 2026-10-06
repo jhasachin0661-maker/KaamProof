@@ -1,0 +1,27 @@
+{
+  "skill_name": "ai-agent-systems",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a ReAct-style agent that can search the web and answer factual questions, with a 10-step limit and cost tracking.",
+      "expected_output": "The agent implements a ReAct loop with observation-thought-action cycle, web search tool, step counter, and graceful termination.",
+      "files": [],
+      "expectations": [
+        "ReAct loop with explicit thought-action-observation steps",
+        "Step limit of 10 enforced with graceful termination",
+        "Token/cost tracking logged per iteration"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Add a file-writing tool to the agent that requires human approval before execution.",
+      "expected_output": "The agent registers a file-write tool classified as HIGH risk, with human-in-the-loop approval before execution.",
+      "files": [],
+      "expectations": [
+        "File-write tool has typed schema with path and content arguments",
+        "Tool classified as HIGH risk per approval model",
+        "Human approval checkpoint fires before file write executes"
+      ]
+    }
+  ]
+}

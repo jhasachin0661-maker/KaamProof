@@ -1,0 +1,38 @@
+{
+  "skill_name": "api-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design an OpenAPI 3.1 specification for a paginated GET /api/v1/products endpoint with authentication requirements.",
+      "expected_output": "The skill verifies OpenAPI version, defines cursor-based pagination, specifies security schemes, and states explicit auth requirements.",
+      "files": [],
+      "expectations": [
+        "Verifies OpenAPI 3.1 spec version before drafting schema",
+        "Includes cursor-based pagination query parameters and response metadata",
+        "Explicitly specifies authentication requirement for the endpoint"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review a proposed change to delete the legacy 'user_name' field from POST /api/v1/users response.",
+      "expected_output": "The skill detects a breaking change, flags the need for API versioning (/v2), and enforces backwards compatibility rules.",
+      "files": [],
+      "expectations": [
+        "Detects breaking change from removing response payload field",
+        "Enforces API versioning requirement (bump version path or header)",
+        "Recommends field deprecation directive prior to removal"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Design an outbound webhook notification contract for invoice payment completion events.",
+      "expected_output": "The skill formats standard event envelope, specifies HMAC-SHA256 signature headers, and includes timestamp verification.",
+      "files": [],
+      "expectations": [
+        "Formats event payload using standard webhook envelope structure",
+        "Includes HMAC signature header specification for security",
+        "Documents idempotency and retry expectations"
+      ]
+    }
+  ]
+}

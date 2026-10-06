@@ -1,0 +1,38 @@
+{
+  "skill_name": "uiux-visual-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design a SaaS dashboard layout with sidebar navigation and data metric cards using Tailwind CSS.",
+      "expected_output": "The skill reuses existing Tailwind design tokens, applies 8pt spacing grid, ensures WCAG contrast, and defines loading/empty states for metric cards.",
+      "files": [],
+      "expectations": [
+        "Reuses existing Tailwind design system tokens rather than creating redundant styles",
+        "Applies 8pt spatial grid for spacing and layout alignment",
+        "Defines loading skeleton and empty state for dashboard metric cards"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Establish a typography system and semantic color token palette for a new web application.",
+      "expected_output": "The skill defines a type scale, semantic role tokens, and verifies WCAG AA contrast ratio compliance.",
+      "files": [],
+      "expectations": [
+        "Defines a modular type scale with heading, body, and label hierarchies",
+        "Creates semantic color tokens (primary, surface, error, success, warning)",
+        "Verifies WCAG AA minimum 4.5:1 contrast ratio for text tokens"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Audit a Button component design for missing interaction states and WCAG focus compliance.",
+      "expected_output": "The skill checks for hover, focus-visible, active, disabled, loading states, and validates focus ring contrast.",
+      "files": [],
+      "expectations": [
+        "Verifies all 8 component states are defined (default, hover, focus-visible, active, disabled, loading, empty, error)",
+        "Validates focus-visible ring meets 3:1 contrast ratio requirement",
+        "Recommends corrections for missing states"
+      ]
+    }
+  ]
+}

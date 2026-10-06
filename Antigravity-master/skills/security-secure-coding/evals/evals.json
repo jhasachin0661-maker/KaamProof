@@ -1,0 +1,38 @@
+{
+  "skill_name": "security-secure-coding",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review a pull request adding a search endpoint that uses string concatenation in SQL queries.",
+      "expected_output": "The skill identifies SQL injection vulnerability, rates it as HIGH/CRITICAL severity with file:line evidence, and provides a parameterized query fix.",
+      "files": [],
+      "expectations": [
+        "Identifies SQL injection pattern in query string concatenation",
+        "Rates vulnerability severity accurately with file:line reference",
+        "Provides safe parameterized query replacement"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Check our Express server middleware configuration for security headers and CORS policy.",
+      "expected_output": "The skill audits security headers (helmet, CSP, X-Content-Type-Options) and CORS configuration, reporting missing security headers.",
+      "files": [],
+      "expectations": [
+        "Checks for essential security headers like CSP and X-Content-Type-Options",
+        "Audits CORS allowed origins for security risks",
+        "Provides clear remediation middleware code snippets"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Perform security review on a custom JWT authentication implementation and password reset flow.",
+      "expected_output": "The skill flags custom auth and crypto design with REQUIRES HUMAN REVIEW label while identifying any specific security flaws.",
+      "files": [],
+      "expectations": [
+        "Applies REQUIRES HUMAN REVIEW label to auth and crypto design flows",
+        "Reviews token expiration, signing secret handling, and rate limiting",
+        "Outputs structured security report adhering to severity rubric"
+      ]
+    }
+  ]
+}

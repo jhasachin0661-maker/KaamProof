@@ -1,0 +1,38 @@
+{
+  "skill_name": "backend-service",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create an Express API controller route in Node.js for updating user profiles with request boundary validation.",
+      "expected_output": "The skill verifies Express version in package.json, validates input using Zod/Joi, masks sensitive log data, and runs backend tests.",
+      "files": [],
+      "expectations": [
+        "Checks Express version in package manifest before implementation",
+        "Enforces boundary payload validation at controller layer",
+        "Ensures secrets and passwords are redacted from log outputs"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Build an async FastAPI service endpoint in Python for processing asynchronous background jobs via BullMQ or Celery.",
+      "expected_output": "The skill verifies Pydantic/FastAPI versions, offloads heavy computation to background worker, and validates route schema.",
+      "files": [],
+      "expectations": [
+        "Checks Pydantic/FastAPI version compatibility",
+        "Offloads long-running operation to background job queue",
+        "Runs backend unit tests cleanly with exit code 0"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Integrate Stripe payment webhook processing controller in NestJS server.",
+      "expected_output": "The skill verifies Stripe signature, handles events idempotently, and flags payment integration changes as CRITICAL with REQUIRES HUMAN REVIEW.",
+      "files": [],
+      "expectations": [
+        "Flags payment integration change as CRITICAL risk requiring human review",
+        "Verifies cryptographic signature of incoming webhook requests",
+        "Handles payment event processing idempotently"
+      ]
+    }
+  ]
+}

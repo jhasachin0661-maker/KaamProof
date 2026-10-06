@@ -1,0 +1,38 @@
+{
+  "skill_name": "config-env-secrets",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a .env.example file and add Zod startup validation for our API keys and database URL.",
+      "expected_output": "The skill runs find_env_usage.py, generates a clean .env.example with variable names only, and adds startup Zod schema validation.",
+      "files": [],
+      "expectations": [
+        "The skill executes python scripts/find_env_usage.py to detect environment variables",
+        "The generated .env.example contains variable names with empty or dummy placeholders without real secrets",
+        "A startup schema validation file is created or updated for type-safe environment loading"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Check if our .gitignore properly ignores secret files and audit the codebase for committed secrets.",
+      "expected_output": "The skill inspects .gitignore to ensure .env patterns are included and scans repository files for exposed credentials.",
+      "files": [],
+      "expectations": [
+        "The skill verifies that .env is present in .gitignore",
+        "The skill scans working tree files for committed API key patterns",
+        "No secret values are output or printed in logs or context files"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We are getting a 'works on my machine' error due to missing environment variables on staging.",
+      "expected_output": "The skill compares environment variable requirements across local and staging environments, generating a missing variable report.",
+      "files": [],
+      "expectations": [
+        "The skill identifies missing environment variables required by application startup schemas",
+        "An environment parity report is added to the handoff file",
+        "Modifications to staging environment variables are flagged for MEDIUM or HIGH risk approval"
+      ]
+    }
+  ]
+}

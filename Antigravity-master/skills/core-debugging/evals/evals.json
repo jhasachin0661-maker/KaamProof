@@ -1,0 +1,38 @@
+{
+  "skill_name": "core-debugging",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The Next.js build is failing with 'TS2322: Type string is not assignable to type number' in src/components/TaskCard.tsx line 42.",
+      "expected_output": "The skill classifies the error as a TypeScript compiler error, inspects the full file at the cited line, applies a minimal type fix, and re-runs tsc --noEmit to verify exit code 0.",
+      "files": [],
+      "expectations": [
+        "The error is classified using the classifier table and routed to the TypeScript error guide",
+        "The full file at the cited line is inspected before proposing a fix",
+        "The typecheck command is re-run after applying the fix and exit code 0 is verified"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Our API tests are returning 500 Internal Server Error on GET /api/tasks and the test suite is failing with 3 test failures.",
+      "expected_output": "The skill reproduces the test failures, traces the API handler, identifies the root cause, applies a fix, runs the full test suite, and checks for regressions.",
+      "files": [],
+      "expectations": [
+        "The failing test command is executed to reproduce the error with exact exit code and output",
+        "The API route handler file is inspected to trace the error root cause",
+        "The full test suite is re-run after the fix to verify zero regressions"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Docker container keeps exiting with code 137 and our database connection times out with ECONNREFUSED on port 5432.",
+      "expected_output": "The skill classifies the OOM kill and DB connection error, checks docker logs and env vars, and applies targeted fixes.",
+      "files": [],
+      "expectations": [
+        "Both error symptoms are classified separately using the classifier table",
+        "Docker logs are inspected with diagnostic commands before proposing fixes",
+        "No tests or lint rules are deleted or weakened to resolve the errors"
+      ]
+    }
+  ]
+}

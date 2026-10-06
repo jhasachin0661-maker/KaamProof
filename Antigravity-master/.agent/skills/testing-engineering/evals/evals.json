@@ -1,0 +1,38 @@
+{
+  "skill_name": "testing-engineering",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write unit tests for the calculateTotal utility in src/utils/calculateTotal.ts which sums item prices multiplied by quantities.",
+      "expected_output": "The skill writes Jest/Vitest unit tests matching existing conventions covering happy path, empty input, and decimal edge cases, then runs the test suite.",
+      "files": [],
+      "expectations": [
+        "Tests are written using the repo's existing test framework and file naming convention",
+        "Edge cases including empty array and decimal precision are covered",
+        "The test command is executed and exit code 0 is verified in the handoff"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We just fixed a bug where marking a task as complete reset its priority to medium. Write a regression test.",
+      "expected_output": "The skill writes a regression test that reproduces the original failure scenario, verifies the fix, and cites the bug in the test name.",
+      "files": [],
+      "expectations": [
+        "The regression test is named with a reference to the specific bug being fixed",
+        "The test verifies that task priority is preserved after marking complete",
+        "The test suite runs clean with exit code 0 after the regression test is added"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Add API tests for our GET /api/tasks and POST /api/tasks endpoints with authentication checks.",
+      "expected_output": "The skill writes Supertest API tests for happy path and auth error cases, targeting the local dev server.",
+      "files": [],
+      "expectations": [
+        "API tests validate both 200 success and 401 unauthorized response codes",
+        "Tests target localhost endpoints and never reference production or staging URLs",
+        "Test assertions verify response body structure and Content-Type header"
+      ]
+    }
+  ]
+}

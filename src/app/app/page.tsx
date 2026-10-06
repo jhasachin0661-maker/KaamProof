@@ -245,9 +245,16 @@ export default function KaamProofApp() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: authPhone.trim(), password: authPassword, confirmPassword: authConfirmPassword, name: authName.trim(), role: selectedAuthRole }),
         });
-        const data = await res.json();
+        const responseText = await res.text();
+        let data: Record<string, any> = {};
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch {
+          throw new Error(`Server returned an unreadable response (${res.status}). Please try again or contact support.`);
+        }
         if (!res.ok) throw new Error(data.message_hi || data.message_en || data.error || "Authentication failed");
-        await startSession(data, authMode === "register" ? "Account created successfully." : `Welcome back, ${data.user.name}!`);
+        if (!data.user) throw new Error("Login response was incomplete. Please try again.");
+        await startSession(data as { user: UserData; profile?: WorkerProfile | null }, authMode === "register" ? "Account created successfully." : `Welcome back, ${data.user.name}!`);
       } catch (err) {
         showToast((err as Error).message, "error");
       } finally {

@@ -918,9 +918,11 @@ export default function KaamProofApp() {
   // ============================================================================
   if (authChecking) {
     return (
-      <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col items-center justify-center p-6">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-stone-400 text-sm">सुरक्षित सत्र की जांच हो रही है (Verifying session)...</p>
+      <div className="kp-session-loading min-h-screen flex flex-col items-center justify-center p-6" role="status" aria-live="polite">
+        <div className="kp-loading-mark"><span>क</span><i /></div>
+        <p className="kp-loading-title">KaamProof तैयार हो रहा है</p>
+        <p className="kp-loading-copy">आपके सुरक्षित सत्र की पुष्टि की जा रही है…</p>
+        <div className="kp-loading-steps" aria-label="Loading progress"><span className="active">सुरक्षित कनेक्शन</span><span>आपका workspace</span><span>आज की स्थिति</span></div>
       </div>
     );
   }
@@ -1300,7 +1302,7 @@ export default function KaamProofApp() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
             <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-stone-400 text-sm">डेटाबेस से आपके व्यक्तिगत रिकॉर्ड लोड हो रहे हैं...</p>
+            <p className="text-stone-400 text-sm">आपका सुरक्षित workspace तैयार किया जा रहा है…</p>
           </div>
         ) : (
           <div>
